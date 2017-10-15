@@ -1,5 +1,4 @@
 # React-Data-Export
-============
 
 A data export library built with and for [React](http://facebook.github.io/react/index.html). 
 
@@ -52,3 +51,25 @@ class App extends React.Component {
     }
 }
 ```
+
+![Example](https://i.imgur.com/6fwdJeo.png)
+
+## Dependencis 
+This package uses [file-saver](https://www.npmjs.com/package/file-saver) and [xlsx](https://www.npmjs.com/package/xlsx) and using [json-loader](https://www.npmjs.com/package/json-loader) will do the magic for you.
+
+
+```javascript
+///webpack.config.js
+vendor: [
+        .....
+        'xlsx',
+        'file-saver'
+],
+.....
+node: {fs: 'empty'},
+externals: [
+    {'./cptable': 'var cptable'},
+    {'./jszip': 'jszip'}
+ ]
+```
+
