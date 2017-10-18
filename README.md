@@ -1,5 +1,9 @@
 # React-Data-Export
 
+[![npm version](https://badge.fury.io/js/react-data-export.svg)](https://badge.fury.io/js/react-data-export)
+[![dependencies Status](https://david-dm.org/securedeveloper/react-data-export/status.svg)](https://david-dm.org/securedeveloper/react-data-export)
+[![devDependencies Status](https://david-dm.org/securedeveloper/react-data-export/dev-status.svg)](https://david-dm.org/securedeveloper/react-data-export?type=dev)
+
 A data export library built with and for [React](http://facebook.github.io/react/index.html). 
 
 ## Example
