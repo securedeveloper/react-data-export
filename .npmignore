@@ -1,3 +1,4 @@
 .babelrc
 lib
-CODE_OF_CONDUCT.md
+/.nyc_output/
+/coverage/
