@@ -3,3 +3,5 @@ lib
 node_modules
 *.log
 .idea/
+/.nyc_output/
+/coverage/

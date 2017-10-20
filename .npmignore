@@ -1,2 +1,4 @@
 .babelrc
 lib
+/.nyc_output/
+/coverage/
