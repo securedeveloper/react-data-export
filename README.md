@@ -42,6 +42,19 @@ const dataSet1 = [
     }
 ];
 
+var dataSet2 = [
+    {
+        name: "Johnson",
+        total: 25,
+        remainig: 16
+    },
+    {
+        name: "Josef",
+        total: 25,
+        remainig: 7
+    }
+];
+
 class App extends React.Component {
     render() {
         return (
@@ -53,6 +66,11 @@ class App extends React.Component {
                     <ExcelColumn label="Marital Status" 
                                  value={(col) => col.is_married ? "Married" : "Single"} />
                 </ExcelSheet>
+                <ExcelSheet data={dataSet2} name="Leaves">
+                    <ExcelColumn label="Name" value="name" />
+                    <ExcelColumn label="Total Leaves" value="total" />
+                    <ExcelColumn label="Remaining Leaves" value="remaining" />
+                </ExcelSheet>
             </ExcelFile>
         );
     }
@@ -61,8 +79,61 @@ class App extends React.Component {
 
 ![Example](https://i.imgur.com/6fwdJeo.png)
 
+With release `0.3.0` and upwards you can also pass **multiple** dataset to *ExcelSheet*, and you can have more than one *ExcelSheets* in 1 excel file.
+
+```javascript
+/*When you want to use dataSet directly, you can specify multiple data to single ExcelSheet with following structure,
+//i.e You can have multiple dataSets on Multiple Sheets in Single Excel File
+interface {
+        xSteps?: number; //How many cells to skips from left (Optional)
+        ySteps?: number; //How many rows to skips from last data (Optional)
+        columns: [array | string] //array (required)
+        data: [array_of_array | string|boolean|number] //array of arrays (required)
+    }
+*/
+import React from "react"
+import {default as ExcelFile, ExcelSheet} from "react-data-export"
+
+const multiDataSet = [
+    {
+        columns: ["Name", "Salary", "Sex"],
+        data: [
+            ["Johnson", 30000, "Male"],
+            ["Monika", 355000, "Female"],
+            ["Konstantina", 20000, "Female"],
+            ["John", 250000, "Male"],
+            ["Josef", 450500, "Male"],
+        ]
+    },
+    {
+        xSteps: 1, // Will start putting cell with 1 empty cell on left most
+        ySteps: 5, //will put space of 5 rows,
+        columns: ["Name", "Department"],
+        data: [
+            ["Johnson", "Finance"],
+            ["Monika", "IT"],
+            ["Konstantina", "IT Billing"],
+            ["John", "HR"],
+            ["Josef", "Testing"],
+        ]
+    }
+];
+
+class App extends React.Component {
+    render() {
+        return (
+            <ExcelFile>
+                <ExcelSheet dataSet={multiDataSet} name="Organization" />
+                <!-- You can add more ExcelSheets if you need -->
+            </ExcelFile>
+        );
+    }
+}
+```
+
+
 ## Dependencis 
-This package uses [file-saver](https://www.npmjs.com/package/file-saver) and [xlsx](https://www.npmjs.com/package/xlsx) and using [json-loader](https://www.npmjs.com/package/json-loader) will do the magic for you.
+This library uses [file-saver](https://www.npmjs.com/package/file-saver) and [xlsx](https://www.npmjs.com/package/xlsx) and using [json-loader](https://www.npmjs.com/package/json-loader) will do the magic for you.
 
 
 ```javascript
