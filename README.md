@@ -132,7 +132,7 @@ class App extends React.Component {
 ```
 
 
-## Dependencis 
+## Dependencies 
 This library uses [file-saver](https://www.npmjs.com/package/file-saver) and [xlsx](https://www.npmjs.com/package/xlsx) and using [json-loader](https://www.npmjs.com/package/json-loader) will do the magic for you.
 
 
