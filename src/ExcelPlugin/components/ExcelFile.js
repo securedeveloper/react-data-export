@@ -4,11 +4,15 @@ import {saveAs} from "file-saver";
 import XLSX from "xlsx";
 
 import ExcelSheet from "../elements/ExcelSheet";
-import { strToArrBuffer, excelSheetFromAoA, excelSheetFromDataSet } from "../utils/DataUtil";
+import {strToArrBuffer, excelSheetFromAoA, excelSheetFromDataSet} from "../utils/DataUtil";
 
 class ExcelFile extends React.Component {
+    fileExtensions = ['xlsx', 'xls', 'csv', 'txt', 'html'];
+    defaultFileExtension = 'xlsx';
+
     static  props = {
         filename: PropTypes.string,
+        fileExtension: PropTypes.string,
         element: PropTypes.any,
         children: function (props, propName, componentName) {
             React.Children.forEach(props[propName], child => {
@@ -20,7 +24,8 @@ class ExcelFile extends React.Component {
     };
 
     static defaultProps = {
-        filename: "Download.xlsx",
+        filename: "Download",
+        fileExtension: "xlsx",
         element: <button>Download</button>
     };
 
@@ -65,8 +70,40 @@ class ExcelFile extends React.Component {
             }
         });
 
-        const wbout = XLSX.write(wb, {bookType: 'xlsx', bookSST: true, type: 'binary'});
-        saveAs(new Blob([strToArrBuffer(wbout)], {type: "application/octet-stream"}), this.props.filename);
+        const fileExtension = this.getFileExtension();
+        const fileName = this.getFileName();
+        const wbout = XLSX.write(wb, {bookType: fileExtension, bookSST: true, type: 'binary'});
+
+        saveAs(new Blob([strToArrBuffer(wbout)], {type: "application/octet-stream"}), fileName);
+    }
+
+    getFileName() {
+        if (this.props.filename === null || typeof this.props.filename !== 'string') {
+            throw Error('Invalid file name provided');
+        }
+        return this.getFileNameWithExtension(this.props.filename, this.getFileExtension());
+    }
+
+    getFileExtension() {
+        let extension = this.props.fileExtension;
+
+        if (extension.length === 0) {
+            const slugs = this.props.filename.split('.');
+            if (slugs.length === 0) {
+                throw Error('Invalid file name provided');
+            }
+            extension = slugs[slugs.length - 1];
+        }
+
+        if (this.fileExtensions.indexOf(extension) !== -1) {
+            return extension;
+        }
+
+        return this.defaultFileExtension;
+    }
+
+    getFileNameWithExtension(filename, extension) {
+        return `${filename}.${extension}`;
     }
 
     render() {
