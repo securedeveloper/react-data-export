@@ -9,127 +9,109 @@
 
 A data export library built with and for [React](http://facebook.github.io/react/index.html). 
 
-## Getting Started
+## Installation
 
-```javascript
-import React from "react"
-import * from "react-data-export"
+With [npm](https://www.npmjs.org/package/react-data-export):
 
-const dataSet1 = [
-    {
-        name: "Johson",
-        amount: 30000,
-        sex: 'M',
-        is_married: true
-    },
-    {
-        name: "Monika",
-        amount: 355000,
-        sex: 'F',
-        is_married: false
-    },
-    {
-        name: "John",
-        amount: 250000,
-        sex: 'M',
-        is_married: false
-    },
-    {
-        name: "Josef",
-        amount: 450500,
-        sex: 'M',
-        is_married: true
-    }
-];
-
-var dataSet2 = [
-    {
-        name: "Johnson",
-        total: 25,
-        remainig: 16
-    },
-    {
-        name: "Josef",
-        total: 25,
-        remainig: 7
-    }
-];
-
-class App extends React.Component {
-    render() {
-        return (
-            <ExcelFile>
-                <ExcelSheet data={dataSet1} name="Employees">
-                    <ExcelColumn label="Name" value="name" />
-                    <ExcelColumn label="Wallet Money" value="amount" />
-                    <ExcelColumn label="Gender" value="sex" />
-                    <ExcelColumn label="Marital Status" 
-                                 value={(col) => col.is_married ? "Married" : "Single"} />
-                </ExcelSheet>
-                <ExcelSheet data={dataSet2} name="Leaves">
-                    <ExcelColumn label="Name" value="name" />
-                    <ExcelColumn label="Total Leaves" value="total" />
-                    <ExcelColumn label="Remaining Leaves" value="remaining" />
-                </ExcelSheet>
-            </ExcelFile>
-        );
-    }
-}
+```sh
+npm install react-data-export --save
 ```
 
-![Example](https://i.imgur.com/6fwdJeo.png)
+## Code Examples
+* [Simple Excel Export](examples/simple_excel_export_01.md)
+* [Excel Export with Dataset](examples/simple_excel_export_02.md)
+* [Excel Export with Custom Download Button](examples/with_custom_download_element.md)
+* [Excel Export with custom cells style](examples/styled_excel_sheet.md)
 
-With release `0.3.0` and upwards you can also pass **multiple** dataset to *ExcelSheet*, and you can have more than one *ExcelSheets* in 1 excel file.
+## Excel Props
+| Prop          | Type                 | Default    | Required | Description                      
+| :------------ | :------------------- | :--------- | :------- | :------------------------------- 
+| filename      | `string`             | Download   | `false`  | Excel file name to be downloaded 
+| fileExtension | `string`             | xlsx       | `false`  | Download file extension [xlsx]
+| element       | `HTMLElement`        | `<button>` | `false`  | Element to download excel file
+| children      | `Array<ExcelSheet>`  |  `null`    | `true`   | ExcelSheet Represents data
 
-```javascript
-/*When you want to use dataSet directly, you can specify multiple data to single ExcelSheet with following structure,
-//i.e You can have multiple dataSets on Multiple Sheets in Single Excel File
-interface {
-        xSteps?: number; //How many cells to skips from left (Optional)
-        ySteps?: number; //How many rows to skips from last data (Optional)
-        columns: [array | string] //array (required)
-        data: [array_of_array | string|boolean|number] //array of arrays (required)
-    }
-*/
-import React from "react"
-import {default as ExcelFile, ExcelSheet} from "react-data-export"
+### ExcelSheet Props
+| Prop          | Type                    | Default    | Required | Description                      
+| :------------ | :---------------------- | :--------- | :------- | :------------------------------- 
+| name          | `string`                | `""`       | `true`   | Sheet name in file 
+| data          | `array<object>`         | `null`     | `false`  | Excel Sheet data 
+| dataSet       | `array<ExcelSheetData>` | `null`     | `false`  | Excel Sheet data
+| children      | `ExcelColumn`           |  `null`    | `false`  | ExcelColumns
 
-const multiDataSet = [
-    {
-        columns: ["Name", "Salary", "Sex"],
-        data: [
-            ["Johnson", 30000, "Male"],
-            ["Monika", 355000, "Female"],
-            ["Konstantina", 20000, "Female"],
-            ["John", 250000, "Male"],
-            ["Josef", 450500, "Male"],
-        ]
-    },
-    {
-        xSteps: 1, // Will start putting cell with 1 empty cell on left most
-        ySteps: 5, //will put space of 5 rows,
-        columns: ["Name", "Department"],
-        data: [
-            ["Johnson", "Finance"],
-            ["Monika", "IT"],
-            ["Konstantina", "IT Billing"],
-            ["John", "HR"],
-            ["Josef", "Testing"],
-        ]
-    }
-];
+**Note:** In ExcelSheet props `dataSet` has `presedence` over `data` and `children` props.
 
-class App extends React.Component {
-    render() {
-        return (
-            <ExcelFile>
-                <ExcelSheet dataSet={multiDataSet} name="Organization" />
-                <!-- You can add more ExcelSheets if you need -->
-            </ExcelFile>
-        );
-    }
-}
-```
+For further types and definitions [Read More](types/types.md)
+
+## Cell Style
+
+Cell styles are specified by a style object that roughly parallels the OpenXML structure.  The style object has five
+top-level attributes: `fill`, `font`, `numFmt`, `alignment`, and `border`.
+
+| Style Attribute | Sub Attributes | Values |
+| :-------------- | :------------- | :------------- |
+| fill            | patternType    |  `"solid"` or `"none"`
+|                 | fgColor        |  `COLOR_SPEC`
+|                 | bgColor        |  `COLOR_SPEC`
+| font            | name           |  `"Calibri"` // default
+|                 | sz             |  `"11"` // font size in points
+|                 | color          |  `COLOR_SPEC`
+|                 | bold           |  `true` or `false`
+|                 | underline      |  `true` or `false`
+|                 | italic         |  `true` or `false`
+|                 | strike         |  `true` or `false`
+|                 | outline        |  `true` or `false`
+|                 | shadow         |  `true` or `false`
+|                 | vertAlign      |  `true` or `false`
+| numFmt          |                |  `"0"`  // integer index to built in formats, see StyleBuilder.SSF property
+|                 |                |  `"0.00%"` // string matching a built-in format, see StyleBuilder.SSF
+|                 |                |  `"0.0%"`  // string specifying a custom format
+|                 |                |  `"0.00%;\\(0.00%\\);\\-;@"` // string specifying a custom format, escaping special characters
+|                 |                |  `"m/dd/yy"` // string a date format using Excel's format notation
+| alignment       | vertical       | `"bottom"` or `"center"` or `"top"`
+|                 | horizontal     | `"bottom"` or `"center"` or `"top"`
+|                 | wrapText       |  `true ` or ` false`
+|                 | readingOrder   |  `2` // for right-to-left
+|                 | textRotation   | Number from `0` to `180` or `255` (default is `0`)
+|                 |                |  `90` is rotated up 90 degrees
+|                 |                |  `45` is rotated up 45 degrees
+|                 |                | `135` is rotated down 45 degrees
+|                 |                | `180` is rotated down 180 degrees
+|                 |                | `255` is special,  aligned vertically
+| border          | top            | `{ style: BORDER_STYLE, color: COLOR_SPEC }`
+|                 | bottom         | `{ style: BORDER_STYLE, color: COLOR_SPEC }`
+|                 | left           | `{ style: BORDER_STYLE, color: COLOR_SPEC }`
+|                 | right          | `{ style: BORDER_STYLE, color: COLOR_SPEC }`
+|                 | diagonal       | `{ style: BORDER_STYLE, color: COLOR_SPEC }`
+|                 | diagonalUp     | `true` or `false`
+|                 | diagonalDown   | `true` or `false`
+
+**COLOR_SPEC**: Colors for `fill`, `font`, and `border` are specified as objects, either:
+* `{ auto: 1}` specifying automatic values
+* `{ rgb: "FFFFAA00" }` specifying a hex ARGB value
+* `{ theme: "1", tint: "-0.25"}` specifying an integer index to a theme color and a tint value (default 0)
+* `{ indexed: 64}` default value for `fill.bgColor`
+
+**BORDER_STYLE**: Border style is a string value which may take on one of the following values:
+ * `thin`
+ * `medium`
+ * `thick`
+ * `dotted`
+ * `hair`
+ * `dashed`
+ * `mediumDashed`
+ * `dashDot`
+ * `mediumDashDot`
+ * `dashDotDot`
+ * `mediumDashDotDot`
+ * `slantDashDot`
+
+
+Borders for merged areas are specified for each cell within the merged area.  So to apply a box border to a merged area of 3x3 cells, border styles would need to be specified for eight different cells:
+* left borders for the three cells on the left,
+* right borders for the cells on the right
+* top borders for the cells on the top
+* bottom borders for the cells on the left
 
 
 ## Dependencies 

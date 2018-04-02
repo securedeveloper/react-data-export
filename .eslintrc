@@ -2,7 +2,8 @@
   "extends": "eslint:recommended",
   "root": true,
   "parser": "babel-eslint",
-  "plugins": [ /*"import", */
+  "plugins": [
+    /*"import", */
     "jsx-a11y",
     "react"
   ],
