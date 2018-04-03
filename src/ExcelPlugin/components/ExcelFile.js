@@ -11,6 +11,7 @@ class ExcelFile extends React.Component {
     defaultFileExtension = 'xlsx';
 
     static  props = {
+        hideElement: PropTypes.bool,
         filename: PropTypes.string,
         fileExtension: PropTypes.string,
         element: PropTypes.any,
@@ -24,6 +25,7 @@ class ExcelFile extends React.Component {
     };
 
     static defaultProps = {
+        hideElement: false,
         filename: "Download",
         fileExtension: "xlsx",
         element: <button>Download</button>
@@ -32,7 +34,12 @@ class ExcelFile extends React.Component {
     constructor(props) {
         super(props);
 
-        this.handleDownload = this.download.bind(this);
+        if (this.props.hideElement) {
+            this.download();
+        } else {
+            this.handleDownload = this.download.bind(this);
+        }
+
         this.createSheetData = this.createSheetData.bind(this);
     }
 
@@ -107,7 +114,14 @@ class ExcelFile extends React.Component {
     }
 
     render() {
-        return (<span onClick={this.handleDownload}>{this.props.element}</span>);
+        const { hideElement, element } = this.props;
+
+        if (props.hideElement) {
+            return null;
+        } else {
+            return (<span onClick={this.handleDownload}>{element}</span>);
+        }
+        
     }
 }
 
