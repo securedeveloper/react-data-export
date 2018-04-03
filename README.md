@@ -26,7 +26,8 @@ npm install react-data-export --save
 
 ## Excel Props
 | Prop          | Type                 | Default    | Required | Description                      
-| :------------ | :------------------- | :--------- | :------- | :------------------------------- 
+| :------------ | :------------------- | :--------- | :------- | :-------------------------------------------------
+| hideElement	| `bool`			   | false      | `false`  | To hide the button & directly download excel file
 | filename      | `string`             | Download   | `false`  | Excel file name to be downloaded 
 | fileExtension | `string`             | xlsx       | `false`  | Download file extension [xlsx]
 | element       | `HTMLElement`        | `<button>` | `false`  | Element to download excel file
@@ -40,7 +41,7 @@ npm install react-data-export --save
 | dataSet       | `array<ExcelSheetData>` | `null`     | `false`  | Excel Sheet data
 | children      | `ExcelColumn`           |  `null`    | `false`  | ExcelColumns
 
-**Note:** In ExcelSheet props `dataSet` has `presedence` over `data` and `children` props.
+**Note:** In ExcelSheet props `dataSet` has `precedence` over `data` and `children` props.
 
 For further types and definitions [Read More](types/types.md)
 
