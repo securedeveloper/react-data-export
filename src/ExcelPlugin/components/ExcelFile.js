@@ -116,7 +116,7 @@ class ExcelFile extends React.Component {
     render() {
         const { hideElement, element } = this.props;
 
-        if (props.hideElement) {
+        if (hideElement) {
             return null;
         } else {
             return (<span onClick={this.handleDownload}>{element}</span>);
