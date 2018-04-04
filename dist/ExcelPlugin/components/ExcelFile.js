@@ -145,7 +145,7 @@ var ExcelFile = function (_React$Component) {
                 element = _props.element;
 
 
-            if (props.hideElement) {
+            if (hideElement) {
                 return null;
             } else {
                 return _react2.default.createElement(
