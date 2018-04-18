@@ -1,11 +1,14 @@
 {
-  "extends": "eslint:recommended",
+  "extends": [
+    "eslint:recommended",
+    "plugin:jest/recommended"
+  ],
   "root": true,
   "parser": "babel-eslint",
   "plugins": [
-    /*"import", */
     "jsx-a11y",
-    "react"
+    "react",
+    "jest"
   ],
   "env": {
     "browser": true,
