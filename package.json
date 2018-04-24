@@ -21,7 +21,6 @@
   "homepage": "https://github.com/securedeveloper/react-data-export#readme",
   "dependencies": {
     "file-saver": "1.3.3",
-    "tempa-xlsx": "0.0.1",
     "xlsx": "git+https://github.com/securedeveloper/js-xlsx.git"
   },
   "devDependencies": {
