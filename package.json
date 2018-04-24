@@ -55,6 +55,6 @@
   },
   "dependencies": {
     "file-saver": "1.3.3",
-    "xlsx": "git+https://github.com/securedeveloper/js-xlsx.git"
+    "tempa-xlsx": "0.0.1"
   }
 }
