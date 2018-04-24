@@ -1,6 +1,6 @@
 {
   "name": "react-data-export",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "main": "dist/index.js",
   "description": "A set of tools to export dataset from react to different formats.",
   "repository": {
