@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.4.0"></a>
+# [0.4.0](https://github.com/securedeveloper/react-data-export/compare/v0.3.7...v0.4.0) (2018-04-24)
+
+
+### Bug Fixes
+
+* **graphite:** move to npm package ([560b2f9](https://github.com/securedeveloper/react-data-export/commit/560b2f9)), closes [issue#41](https://github.com/issue/issues/41)
+
+
+### Features
+
+* add jest support ([ff3a2ba](https://github.com/securedeveloper/react-data-export/commit/ff3a2ba))
+
+
+
 <a name="0.3.7"></a>
 ## [0.3.7](https://github.com/securedeveloper/react-data-export/compare/v0.3.6...v0.3.7) (2018-04-04)
 
