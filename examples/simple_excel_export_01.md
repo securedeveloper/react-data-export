@@ -35,7 +35,7 @@ const dataSet1 = [
     }
 ];
 
-var dataSet2 = [
+const dataSet2 = [
     {
         name: "Johnson",
         total: 25,
