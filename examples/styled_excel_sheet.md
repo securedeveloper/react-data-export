@@ -8,7 +8,11 @@ const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
 
 const multiDataSet = [
     {
-        columns: ["Headings", "Text Style", "Colors"],
+        columns: [
+            {title: "Headings", width: {wpx: 80}},//pixels width 
+            {title: "Text Style", width: {wch: 40}},//char width 
+            {title: "Colors", width: {wpx: 90}},
+        ],
         data: [
             [
                 {value: "H1", style: {font: {sz: "24", bold: true}}},
