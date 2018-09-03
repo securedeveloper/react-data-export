@@ -1,5 +1,7 @@
 # React-Data-Export
 
+##### :warning: A complete re-write is coming soon (we won't need xlsx package anymore (It will be backward compatible):warning: 
+
 [![npm version](https://badge.fury.io/js/react-data-export.svg)](https://badge.fury.io/js/react-data-export)
 [![dependencies Status](https://david-dm.org/securedeveloper/react-data-export/status.svg)](https://david-dm.org/securedeveloper/react-data-export)
 [![devDependencies Status](https://david-dm.org/securedeveloper/react-data-export/dev-status.svg)](https://david-dm.org/securedeveloper/react-data-export?type=dev)
