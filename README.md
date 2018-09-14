@@ -2,6 +2,9 @@
 
 ##### :warning: A complete re-write is coming soon (we won't need xlsx package anymore (It will be backward compatible):warning: 
 
+## :new: I am re-writing complete excel api in JavaScript, please consider contributing or putting your ideas here https://github.com/securedeveloper/javascript-excel (After finishing will update this library)
+(:exclamation::exclamation::exclamation:The purpose of having a new library is that open source libraries either does not support styling and rest functionality in excel or they are too heavy to  consider)
+
 [![npm version](https://badge.fury.io/js/react-data-export.svg)](https://badge.fury.io/js/react-data-export)
 [![dependencies Status](https://david-dm.org/securedeveloper/react-data-export/status.svg)](https://david-dm.org/securedeveloper/react-data-export)
 [![devDependencies Status](https://david-dm.org/securedeveloper/react-data-export/dev-status.svg)](https://david-dm.org/securedeveloper/react-data-export?type=dev)
