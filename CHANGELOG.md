@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.5.0"></a>
+# [0.5.0](https://github.com/securedeveloper/react-data-export/compare/v0.4.2...v0.5.0) (2018-09-24)
+
+
+### Bug Fixes
+
+* Fixed[#41](https://github.com/securedeveloper/react-data-export/issues/41), Fixed[#55](https://github.com/securedeveloper/react-data-export/issues/55), Fixed[#66](https://github.com/securedeveloper/react-data-export/issues/66), Fixed[#67](https://github.com/securedeveloper/react-data-export/issues/67), Fixed[#68](https://github.com/securedeveloper/react-data-export/issues/68), Fixed[#69](https://github.com/securedeveloper/react-data-export/issues/69), Fixed[#72](https://github.com/securedeveloper/react-data-export/issues/72) ([0144afc](https://github.com/securedeveloper/react-data-export/commit/0144afc))
+* int cells were not supported in dataSet format ([513ae48](https://github.com/securedeveloper/react-data-export/commit/513ae48))
+* package vulnerabilities. ([082947a](https://github.com/securedeveloper/react-data-export/commit/082947a))
+* package vulnerabilities. ([d66eb9e](https://github.com/securedeveloper/react-data-export/commit/d66eb9e))
+* updated package to tempa-xlsx, updated jest test environment and imports. ([b4f03ac](https://github.com/securedeveloper/react-data-export/commit/b4f03ac))
+
+
+### Features
+
+* support col width ([dc6dc60](https://github.com/securedeveloper/react-data-export/commit/dc6dc60))
+* update example with col widths ([4863aaf](https://github.com/securedeveloper/react-data-export/commit/4863aaf))
+
+
+
 <a name="0.4.2"></a>
 ## [0.4.2](https://github.com/securedeveloper/react-data-export/compare/v0.4.1...v0.4.2) (2018-04-24)
 
