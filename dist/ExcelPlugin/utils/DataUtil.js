@@ -7,9 +7,9 @@ exports.excelSheetFromDataSet = exports.excelSheetFromAoA = exports.dateToNumber
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var _xlsx = require('xlsx');
+var _tempaXlsx = require('tempa-xlsx');
 
-var _xlsx2 = _interopRequireDefault(_xlsx);
+var _tempaXlsx2 = _interopRequireDefault(_tempaXlsx);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -67,7 +67,7 @@ var excelSheetFromDataSet = function excelSheetFromDataSet(dataSet) {
         var columnsWidth = [];
         if (columns.length >= 0) {
             columns.forEach(function (col, index) {
-                var cellRef = _xlsx2.default.utils.encode_cell({ c: xSteps + index, r: rowCount });
+                var cellRef = _tempaXlsx2.default.utils.encode_cell({ c: xSteps + index, r: rowCount });
                 fixRange(range, 0, 0, rowCount, xSteps, ySteps);
                 var colTitle = col;
                 if ((typeof col === 'undefined' ? 'undefined' : _typeof(col)) === 'object') {
@@ -86,7 +86,7 @@ var excelSheetFromDataSet = function excelSheetFromDataSet(dataSet) {
 
         for (var R = 0; R != data.length; ++R, rowCount++) {
             for (var C = 0; C != data[R].length; ++C) {
-                var cellRef = _xlsx2.default.utils.encode_cell({ c: C + xSteps, r: rowCount });
+                var cellRef = _tempaXlsx2.default.utils.encode_cell({ c: C + xSteps, r: rowCount });
                 fixRange(range, R, C, rowCount, xSteps, ySteps);
                 getCell(data[R][C], cellRef, ws);
             }
@@ -94,7 +94,7 @@ var excelSheetFromDataSet = function excelSheetFromDataSet(dataSet) {
     });
 
     if (range.s.c < 10000000) {
-        ws['!ref'] = _xlsx2.default.utils.encode_range(range);
+        ws['!ref'] = _tempaXlsx2.default.utils.encode_range(range);
     }
 
     return ws;
@@ -129,7 +129,7 @@ function getCell(v, cellRef, ws) {
         cell.t = 'b';
     } else if (isDate) {
         cell.t = 'n';
-        cell.z = _xlsx2.default.SSF._table[14];
+        cell.z = _tempaXlsx2.default.SSF._table[14];
         cell.v = dateToNumber(cell.v);
     } else {
         cell.t = 's';
@@ -182,14 +182,14 @@ var excelSheetFromAoA = function excelSheetFromAoA(data) {
                 continue;
             }
 
-            var cellRef = _xlsx2.default.utils.encode_cell({ c: C, r: R });
+            var cellRef = _tempaXlsx2.default.utils.encode_cell({ c: C, r: R });
             if (typeof cell.v === 'number') {
                 cell.t = 'n';
             } else if (typeof cell.v === 'boolean') {
                 cell.t = 'b';
             } else if (cell.v instanceof Date) {
                 cell.t = 'n';
-                cell.z = _xlsx2.default.SSF._table[14];
+                cell.z = _tempaXlsx2.default.SSF._table[14];
                 cell.v = dateToNumber(cell.v);
             } else {
                 cell.t = 's';
@@ -200,7 +200,7 @@ var excelSheetFromAoA = function excelSheetFromAoA(data) {
     }
 
     if (range.s.c < 10000000) {
-        ws['!ref'] = _xlsx2.default.utils.encode_range(range);
+        ws['!ref'] = _tempaXlsx2.default.utils.encode_range(range);
     }
 
     return ws;
