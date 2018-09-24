@@ -110,25 +110,28 @@ function getHeaderCell(v, cellRef, ws) {
 }
 
 function getCell(v, cellRef, ws) {
-    var cell = {};
+    //assume v is indeed the value. for other cases (object, date...) it will be overriden.
+    var cell = { v: v };
     if (v === null) {
         return;
     }
+
+    var isDate = v instanceof Date;
+    if (!isDate && (typeof v === 'undefined' ? 'undefined' : _typeof(v)) === 'object') {
+        cell.s = v.style;
+        cell.v = v.value;
+        v = v.value;
+    }
+
     if (typeof v === 'number') {
-        cell.v = v;
         cell.t = 'n';
     } else if (typeof v === 'boolean') {
-        cell.v = v;
         cell.t = 'b';
-    } else if (v instanceof Date) {
+    } else if (isDate) {
         cell.t = 'n';
         cell.z = _xlsx2.default.SSF._table[14];
         cell.v = dateToNumber(cell.v);
-    } else if ((typeof v === 'undefined' ? 'undefined' : _typeof(v)) === 'object') {
-        cell.v = v.value;
-        cell.s = v.style;
     } else {
-        cell.v = v;
         cell.t = 's';
     }
     ws[cellRef] = cell;
