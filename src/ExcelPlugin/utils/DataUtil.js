@@ -51,14 +51,24 @@ const excelSheetFromDataSet = (dataSet) => {
 
         rowCount += ySteps;
 
+        var columnsWidth = []
         if (columns.length >= 0) {
             columns.forEach((col, index) => {
                 var cellRef = XLSX.utils.encode_cell({c: xSteps + index, r: rowCount});
                 fixRange(range, 0, 0, rowCount, xSteps, ySteps);
-                getHeaderCell(col, cellRef, ws);
+                var colTitle = col;
+                if (typeof col === 'object'){
+                    colTitle = col.title;
+                    columnsWidth.push(col.width || {wpx:80}); /* wch (chars), wpx (pixels) - e.g. [{wch:6},{wpx:50}] */
+                }
+                getHeaderCell(colTitle, cellRef, ws);
             });
 
             rowCount += 1;
+        }
+
+        if (columnsWidth.length > 0){
+            ws['!cols'] = columnsWidth;
         }
 
         for (var R = 0; R != data.length; ++R, rowCount++) {
