@@ -62,5 +62,8 @@ class App extends Component {
 ```
 
 ## Output
-![Download Button](http://i64.tinypic.com/2mey8na.jpg)
-![Excel File Outpu](http://i63.tinypic.com/2qko404.jpg)
+![Download Button](https://blvenglu.sirv.com/github/download_styled_excel_sheet.png)
+![Excel File Outpu](https://blvenglu.sirv.com/github/styled_excel_sheet.png)
+[Codesandbox](https://codesandbox.io/s/styledexcelsheet-hf5oo "Codesandbox | styled_excel_sheet")
+
+
