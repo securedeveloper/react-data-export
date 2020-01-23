@@ -71,7 +71,7 @@ var excelSheetFromDataSet = function excelSheetFromDataSet(dataSet) {
                 fixRange(range, 0, 0, rowCount, xSteps, ySteps);
                 var colTitle = col;
                 if ((typeof col === 'undefined' ? 'undefined' : _typeof(col)) === 'object') {
-                    colTitle = col.title;
+                    //colTitle = col.title; //moved to getHeaderCell
                     columnsWidth.push(col.width || { wpx: 80 }); /* wch (chars), wpx (pixels) - e.g. [{wch:6},{wpx:50}] */
                 }
                 getHeaderCell(colTitle, cellRef, ws);
@@ -102,8 +102,8 @@ var excelSheetFromDataSet = function excelSheetFromDataSet(dataSet) {
 
 function getHeaderCell(v, cellRef, ws) {
     var cell = {};
-    var headerCellStyle = { font: { bold: true } };
-    cell.v = v;
+    var headerCellStyle = v.style ? v.style : { font: { bold: true } }; //if style is then use it
+    cell.v = v.title;
     cell.t = 's';
     cell.s = headerCellStyle;
     ws[cellRef] = cell;
