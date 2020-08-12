@@ -62,7 +62,7 @@
     "coverage:html": "nyc report --reporter=html",
     "coverage:publish": "nyc report --reporter=lcov | codecov",
     "clean": "rm -rf ./dist && mkdir ./dist",
-    "build": "npm run test && babel src --out-dir dist",
+    "build": "babel src --out-dir dist",
     "build:watch": "babel -w src --out-dir dist",
     "lint": "eslint .",
     "lint:watch": "esw -w lib/**",
