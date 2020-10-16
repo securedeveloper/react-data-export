@@ -29,7 +29,7 @@ type ExcelCellData = ExcelValue | ExcelCell;
 type ExcelValue = string | number | Date | boolean;
 
 interface ExcelCell {
-    value: ExcelCell;
+    value: ExcelCellValue;
     style: ExcelStyle;
 }
 
