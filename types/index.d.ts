@@ -132,6 +132,12 @@ declare module 'react-data-export' {
   export namespace ReactExport {
     export class ExcelFile extends React.Component<ExcelFileProps, any> {
     }
+    export namespace ExcelFile {
+      export class ExcelColumn extends React.Component<ExcelColumnProps, any> {
+      }
+      export class ExcelSheet extends React.Component<ExcelSheetProps, any> {
+      }
+    }
   }
   export default ReactExport
 }
