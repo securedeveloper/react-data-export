@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import {saveAs} from "file-saver";
 import XLSX from "tempa-xlsx";
+import _ from 'lodash'; 
 
 import ExcelSheet from "../elements/ExcelSheet";
 import {strToArrBuffer, excelSheetFromAoA, excelSheetFromDataSet} from "../utils/DataUtil";
@@ -52,7 +53,7 @@ class ExcelFile extends React.Component {
             const sheetRow = [];
 
             React.Children.forEach(columns, column => {
-                const getValue = typeof (column.props.value) === 'function' ? column.props.value : row => row[column.props.value];
+                const getValue = typeof (column.props.value) === 'function' ? column.props.value : row => _.get(row, column.props.value);
                 const itemValue = getValue(row);
                 sheetRow.push(isNaN(itemValue) ? (itemValue || '') : itemValue);
             });
