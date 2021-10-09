@@ -20,6 +20,10 @@ var _tempaXlsx = require("tempa-xlsx");
 
 var _tempaXlsx2 = _interopRequireDefault(_tempaXlsx);
 
+var _lodash = require("lodash");
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
 var _ExcelSheet = require("../elements/ExcelSheet");
 
 var _ExcelSheet2 = _interopRequireDefault(_ExcelSheet);
@@ -68,7 +72,7 @@ var ExcelFile = function (_React$Component) {
 
                 _react2.default.Children.forEach(columns, function (column) {
                     var getValue = typeof column.props.value === 'function' ? column.props.value : function (row) {
-                        return row[column.props.value];
+                        return _lodash2.default.get(row, column.props.value);
                     };
                     var itemValue = getValue(row);
                     sheetRow.push(isNaN(itemValue) ? itemValue || '' : itemValue);
