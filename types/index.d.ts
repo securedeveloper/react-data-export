@@ -1,32 +1,29 @@
-/* index.d.ts (C) react-data-export */
-
-// TypeScript Version: 2.2
-declare module 'react-data-export' {
-  import * as React from 'react'
-
+declare module "react-data-export" {
   export interface ExcelFileProps {
     filename?: string;
+    onFileGenerated?: () => void;
+    onGenerationStart?: () => void;
     fileExtension?: string;
-    element?: any; //Download Element
-    children?: Array<React.ReactChild> | React.ReactChild; // Array<ExcelSheetProps>;
+    element?: any;
+    children?: any
   }
 
   export interface ExcelSheetProps {
     name: string;
-    data?: Array<object>;
-    dataSet?: Array<ExcelSheetData>;
-    value?: Array<string> | Function;
-    children?: Array<React.ReactChild> | React.ReactChild; // Array<ExcelColumnProps>
+    data?: () => any | any[];
+    dataSet?: any;
+    value?: string[] | Function;
+    children?: any
   }
 
   export interface ExcelSheetData {
     xSteps?: number;
     ySteps?: number;
     columns: Array<string>;
-    data: Array<ExcelCellData>;
+    data: any
   }
 
-  export type ExcelCellData = ExcelValue | ExcelCell | Array<ExcelValue>;
+  export type ExcelCellData = ExcelValue | ExcelCell;
   export type ExcelValue = string | number | Date | boolean;
 
   export interface ExcelCell {
@@ -96,7 +93,7 @@ declare module 'react-data-export' {
 
   export type ExcelTextRotation = 0 | 45 | 90 | 135 | 180 | 255;
 
-  export enum ExcelReadingOrder { LeftToRight = 1, RightToLeft}
+  enum ExcelReadingOrder { LeftToRight = 1, RightToLeft }
 
   export type ExcelAlignmentType = "bottom" | "center" | "top";
 
@@ -106,32 +103,12 @@ declare module 'react-data-export' {
     color: ExcelColorSpec;
   }
 
-  export type ExcelBorderStyle =
-    "thin"
-    | "medium"
-    | "thick"
-    | "dotted"
-    | "hair"
-    | "dashed"
-    | "mediumDashed"
-    | "dashDot"
-    | "mediumDashDot"
-    | "dashDotDot"
-    | "mediumDashDotDot"
-    | "slantDashDot";
+  export type ExcelBorderStyle = "thin" | "medium" | "thick" | "dotted" | "hair" | "dashed" | "mediumDashed" | "dashDot" | "mediumDashDot" | "dashDotDot" | "mediumDashDotDot" | "slantDashDot";
 
-  export class ExcelColumn extends React.Component<ExcelColumnProps, any> {
+  declare class ExcelFile extends React.Component<ExcelFileProps> {
+    static ExcelSheet: typeof ExcelSheet
+    static ExcelColumn: typeof ExcelColumn
   }
-
-  export class ExcelSheet extends React.Component<ExcelSheetProps, any> {
-  }
-
-  export class ExcelFile extends React.Component<ExcelFileProps, any> {
-  }
-
-  export namespace ReactExport {
-    export class ExcelFile extends React.Component<ExcelFileProps, any> {
-    }
-  }
-  export default ReactExport
+  declare class ExcelSheet extends React.Component<ExcelSheetProps> { }
+  declare class ExcelColumn extends React.Component<ExcelColumnProps> { }
 }
