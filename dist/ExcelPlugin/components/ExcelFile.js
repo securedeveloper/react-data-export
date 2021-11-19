@@ -84,6 +84,9 @@ var ExcelFile = function (_React$Component) {
         value: function download() {
             var _this2 = this;
 
+            if (this.props.onGenerationStart) {
+                this.props.onGenerationStart();
+            }
             var wb = {
                 SheetNames: _react2.default.Children.map(this.props.children, function (sheet) {
                     return sheet.props.name;
@@ -170,6 +173,7 @@ ExcelFile.props = {
     fileExtension: _propTypes2.default.string,
     element: _propTypes2.default.any,
     onFileGenerated: _propTypes2.default.function,
+    onGenerationStart: _propTypes2.default.function,
     children: function children(props, propName, componentName) {
         _react2.default.Children.forEach(props[propName], function (child) {
             if (child.type !== _ExcelSheet2.default) {

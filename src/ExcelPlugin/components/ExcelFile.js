@@ -16,6 +16,7 @@ class ExcelFile extends React.Component {
         fileExtension: PropTypes.string,
         element: PropTypes.any,
         onFileGenerated: PropTypes.function,
+        onGenerationStart: PropTypes.function,
         children: function (props, propName, componentName) {
             React.Children.forEach(props[propName], child => {
                 if (child.type !== ExcelSheet) {
@@ -65,6 +66,9 @@ class ExcelFile extends React.Component {
     }
 
     download() {
+        if (this.props.onGenerationStart) {
+            this.props.onGenerationStart();
+        }
         const wb = {
             SheetNames: React.Children.map(this.props.children, sheet => sheet.props.name),
             Sheets: {}
@@ -85,7 +89,7 @@ class ExcelFile extends React.Component {
         saveAs(new Blob([strToArrBuffer(wbout)], { type: "application/octet-stream" }), fileName);
 
         if (this.props.onFileGenerated) {
-            this.props.onFileGenerated()
+            this.props.onFileGenerated();
         }
     }
 
