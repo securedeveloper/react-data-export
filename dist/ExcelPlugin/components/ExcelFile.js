@@ -84,6 +84,9 @@ var ExcelFile = function (_React$Component) {
         value: function download() {
             var _this2 = this;
 
+            if (this.props.onGenerationStart) {
+                this.props.onGenerationStart();
+            }
             var wb = {
                 SheetNames: _react2.default.Children.map(this.props.children, function (sheet) {
                     return sheet.props.name;
@@ -104,6 +107,10 @@ var ExcelFile = function (_React$Component) {
             var wbout = _tempaXlsx2.default.write(wb, { bookType: fileExtension, bookSST: true, type: 'binary' });
 
             (0, _fileSaver.saveAs)(new Blob([(0, _DataUtil.strToArrBuffer)(wbout)], { type: "application/octet-stream" }), fileName);
+
+            if (this.props.onFileGenerated) {
+                this.props.onFileGenerated();
+            }
         }
     }, {
         key: "getFileName",
@@ -165,6 +172,8 @@ ExcelFile.props = {
     filename: _propTypes2.default.string,
     fileExtension: _propTypes2.default.string,
     element: _propTypes2.default.any,
+    onFileGenerated: _propTypes2.default.function,
+    onGenerationStart: _propTypes2.default.function,
     children: function children(props, propName, componentName) {
         _react2.default.Children.forEach(props[propName], function (child) {
             if (child.type !== _ExcelSheet2.default) {
