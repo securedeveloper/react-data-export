@@ -30,7 +30,7 @@ declare module 'react-data-export' {
   export type ExcelValue = string | number | Date | boolean;
 
   export interface ExcelCell {
-    value: ExcelCell;
+    value: ExcelValue;
     style: ExcelStyle;
   }
 
