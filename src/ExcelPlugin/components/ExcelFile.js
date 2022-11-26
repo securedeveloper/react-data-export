@@ -44,7 +44,7 @@ class ExcelFile extends React.Component {
     }
 
     createSheetData(sheet) {
-        const columns = sheet.props.children;
+        const columns = sheet.props.children.filter(child => !!child);
         const sheetData = [React.Children.map(columns, column => column.props.label)];
         const data = typeof (sheet.props.data) === 'function' ? sheet.props.data() : sheet.props.data;
 
