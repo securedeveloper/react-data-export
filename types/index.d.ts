@@ -2,13 +2,13 @@
 
 // TypeScript Version: 2.2
 declare module 'react-data-export' {
-  import * as React from 'react'
+  import * as React from 'react';
 
   export interface ExcelFileProps {
     filename?: string;
     fileExtension?: string;
     element?: any; //Download Element
-    children?: Array<React.ReactChild> | React.ReactChild; // Array<ExcelSheetProps>;
+    children?: Array<React.ReactElement> | React.ReactElement; // Array<ExcelSheetProps>;
   }
 
   export interface ExcelSheetProps {
@@ -16,22 +16,27 @@ declare module 'react-data-export' {
     data?: Array<object>;
     dataSet?: Array<ExcelSheetData>;
     value?: Array<string> | Function;
-    children?: Array<React.ReactChild> | React.ReactChild; // Array<ExcelColumnProps>
+    children?: Array<React.ReactElement> | React.ReactElement; // Array<ExcelColumnProps>
   }
 
   export interface ExcelSheetData {
     xSteps?: number;
     ySteps?: number;
-    columns: Array<string>;
-    data: Array<ExcelCellData>;
+    columns: Array<string> | Array<ExcelCellHeader>;
+    data: Array<Array<ExcelCellData>>;
   }
 
   export type ExcelCellData = ExcelValue | ExcelCell | Array<ExcelValue>;
   export type ExcelValue = string | number | Date | boolean;
 
+  export interface ExcelCellHeader {
+    title: string;
+    style?: ExcelStyle;
+  }
+
   export interface ExcelCell {
-    value: ExcelCell;
-    style: ExcelStyle;
+        value: ExcelValue;
+        style?: ExcelStyle;
   }
 
   export interface ExcelColumnProps {
@@ -131,6 +136,8 @@ declare module 'react-data-export' {
 
   export namespace ReactExport {
     export class ExcelFile extends React.Component<ExcelFileProps, any> {
+      static ExcelSheet: React.ElementType<ExcelSheetProps>;
+      static ExcelColumn: React.ElementType<ExcelColumnProps>;
     }
   }
   export default ReactExport
