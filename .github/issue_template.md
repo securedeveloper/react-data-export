@@ -1,7 +1,7 @@
 <!--
 First of all, please read this section
 
-https://github.com/securedeveloper/react-data-export/blob/master/CONTRIBUTING.md
+https://github.com/securedeveloper/react-data-export/blob/main/CONTRIBUTING.md
 
 Some advices before file an issue
   * Give a brief explanation of the issue, suggestion or feature to request.
