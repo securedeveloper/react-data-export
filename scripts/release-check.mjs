@@ -10,10 +10,11 @@
 // Usage (in CI):
 //   node scripts/release-check.mjs --package <dir> [--notes-out <file>]
 //
-// Writes `release`, `name`, `version`, `dist-tag`, `prerelease` and
-// `published` (name@version already on npm) to
-// $GITHUB_OUTPUT, a one-line verdict to $GITHUB_STEP_SUMMARY and, for a
-// release, the version's CHANGELOG.md section to --notes-out.
+// Writes `release`, `name`, `version`, `dist-tag`, `prerelease`, `published`
+// (name@version already on npm) and `version-changed` (differs from HEAD~1)
+// to $GITHUB_OUTPUT, a one-line verdict to $GITHUB_STEP_SUMMARY and, when the
+// version changed, the release notes to --notes-out: that version's section
+// of <package dir>/CHANGELOG.md, or a one-line fallback.
 //
 // Node built-ins only. This file is shared verbatim by the javascript-excel,
 // react-data-export, react-data-import and react-xlsx-viewer repositories;
@@ -65,8 +66,17 @@ export function npmVersionOk(version, min = MIN_NPM) {
 export function decide({ name, version, previousVersion, publishedVersion, isPrivate = false }) {
   parseVersion(version);
   const distTag = isPrerelease(version) ? "next" : "latest";
-  const base = { name, version, distTag, prerelease: distTag === "next", published: Boolean(publishedVersion) };
-  if (isPrivate) return { ...base, release: false, reason: `${name} is private` };
+  const base = {
+    name,
+    version,
+    distTag,
+    prerelease: distTag === "next",
+    published: Boolean(publishedVersion),
+    // Drives the (idempotent) tag + GitHub Release step, so a re-run after a
+    // successful publish but a failed `gh release create` still tags it.
+    versionChanged: previousVersion !== version,
+  };
+  if (isPrivate) return { ...base, versionChanged: false, release: false, reason: `${name} is private` };
   if (previousVersion === version) {
     return { ...base, release: false, reason: `version ${version} unchanged since the previous commit` };
   }
@@ -162,7 +172,7 @@ function main() {
   console.log(`npm ${npmVersion}; ${pkg.name}: HEAD ${pkg.version}, HEAD~1 ${previousVersion ?? "(none)"}, npm ${publishedVersion ?? "(not published)"}`);
   console.log(`${result.release ? "release" : "no release"}: ${result.reason}`);
 
-  if (result.release && args.notesOut) {
+  if (result.versionChanged && args.notesOut) {
     const changelog = join(args.package, "CHANGELOG.md");
     const section = existsSync(changelog)
       ? changelogSection(readFileSync(changelog, "utf8"), pkg.version)
@@ -181,6 +191,7 @@ function main() {
         `dist-tag=${result.distTag}`,
         `prerelease=${result.prerelease}`,
         `published=${result.published}`,
+        `version-changed=${result.versionChanged}`,
         "",
       ].join("\n"),
     );

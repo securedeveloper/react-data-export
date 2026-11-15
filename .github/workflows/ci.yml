@@ -160,7 +160,7 @@ jobs:
       - name: Release preview (what merging this would publish)
         id: check
         run: node scripts/release-check.mjs --package "$PACKAGE_DIR"
-      - run: npm run build
+      - run: npm run build --if-present
       - name: npm pack --dry-run
         run: npm pack "./$PACKAGE_DIR" --dry-run
       - name: npm publish --dry-run

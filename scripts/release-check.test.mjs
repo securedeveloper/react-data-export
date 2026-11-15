@@ -19,22 +19,22 @@ describe("decide", () => {
     {
       title: "changed and unpublished: release on latest",
       input: { version: "1.1.0", previousVersion: "1.0.0", publishedVersion: null },
-      expect: { release: true, distTag: "latest", prerelease: false, published: false },
+      expect: { release: true, distTag: "latest", prerelease: false, published: false, versionChanged: true },
     },
     {
       title: "unchanged: skip",
       input: { version: "1.0.0", previousVersion: "1.0.0", publishedVersion: "1.0.0" },
-      expect: { release: false, distTag: "latest", published: true },
+      expect: { release: false, distTag: "latest", published: true, versionChanged: false },
     },
     {
       title: "unchanged and unpublished (e.g. 2.0.0-alpha.0 never released): skip",
       input: { version: "2.0.0-alpha.0", previousVersion: "2.0.0-alpha.0", publishedVersion: null },
-      expect: { release: false, distTag: "next", published: false },
+      expect: { release: false, distTag: "next", published: false, versionChanged: false },
     },
     {
-      title: "changed but already on npm (re-run after publish): skip",
+      title: "changed but already on npm (re-run after publish): skip publish, still tag",
       input: { version: "1.1.0", previousVersion: "1.0.0", publishedVersion: "1.1.0" },
-      expect: { release: false },
+      expect: { release: false, published: true, versionChanged: true },
     },
     {
       title: "prerelease: release on next",
@@ -54,7 +54,7 @@ describe("decide", () => {
     {
       title: "private package: never",
       input: { version: "1.1.0", previousVersion: "1.0.0", publishedVersion: null, isPrivate: true },
-      expect: { release: false },
+      expect: { release: false, versionChanged: false },
     },
   ];
   for (const c of cases) {

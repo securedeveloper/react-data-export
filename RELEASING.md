@@ -65,8 +65,10 @@ For a release, the job then:
 
 The job also checks that npm is at least 11.5.1, which trusted publishing requires. Node 24 ships a newer npm.
 
-If publishing succeeds but the tag or GitHub Release step fails, a re-run won't redo it, because the version is already on npm. Create it by hand:
-`gh release create v<version> --target <merge sha> --notes-file <notes> [--prerelease]`.
+Re-running the job is safe:
+- After a failed publish, the version is still unpublished, so the re-run publishes.
+- After a successful publish but a failed tag/Release step, the re-run skips publishing and creates the missing tag and Release.
+- If everything already succeeded, the re-run does nothing.
 
 ## 5. First release: one-time setup (Afzal)
 
