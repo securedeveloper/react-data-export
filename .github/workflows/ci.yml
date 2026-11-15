@@ -74,3 +74,69 @@ jobs:
       - name: npm pack --dry-run
         if: matrix.react == 19 && matrix.node == 24
         run: npm pack --dry-run -w react-data-export
+
+  # Consumer TypeScript matrix: one tarball, type-checked by a consumer project
+  # on several TypeScript versions, @types/react majors and moduleResolution modes.
+  pack:
+    name: Pack
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build -w react-data-export
+      - name: npm pack
+        run: |
+          mkdir -p pack
+          npm pack -w react-data-export --pack-destination pack
+          mv pack/*.tgz pack/react-data-export.tgz
+      - uses: actions/upload-artifact@v7
+        with:
+          name: tarball
+          path: pack/react-data-export.tgz
+          retention-days: 3
+
+  consumer-ts:
+    name: Consumer TS ${{ matrix.ts }} / @types/react ${{ matrix.react }}
+    needs: pack
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ts: ['5.0', '5.4', '5.9', '6.0', '7.0']
+        react: [18, 19]
+        include:
+          # The measured floor: TS 4.7 introduced node16/nodenext; `bundler` needs 5.0.
+          - { ts: '4.7', react: 18, resolutions: 'node16,nodenext' }
+          - { ts: '4.7', react: 19, resolutions: 'node16,nodenext' }
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - uses: actions/download-artifact@v8
+        with:
+          name: tarball
+          path: pack
+      # The script only uses Node built-ins; it installs typescript, react and
+      # @types/react into a throwaway consumer project per cell.
+      - name: Type-check consumer fixture
+        run: >-
+          node scripts/consumer-ts.mjs
+          --tarball pack/react-data-export.tgz
+          --ts ${{ matrix.ts }}
+          --react ${{ matrix.react }}
+          --resolution ${{ matrix.resolutions || 'node16,nodenext,bundler' }}
+
+  # Single stable name to mark as a required check.
+  consumer-ts-result:
+    name: Consumer TS
+    needs: consumer-ts
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: All consumer TypeScript cells passed
+        run: test "${{ needs.consumer-ts.result }}" = success

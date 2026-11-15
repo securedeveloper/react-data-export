@@ -9,6 +9,17 @@ Export data from React to `.xlsx` and `.csv`.
 - **0.6.x stays on npm unchanged.** `npm install react-data-export@0.6` keeps working; nothing is unpublished or deprecated.
 - **Legacy code and docs** (0.x README, examples, Babel/Jest setup) live at the [`v0.6.0` tag](https://github.com/securedeveloper/react-data-export/tree/v0.6.0).
 
+## TypeScript support
+
+Types ship with the package (`.d.ts` for `import`, `.d.cts` for `require`). CI type-checks a consumer project against the packed tarball, in strict mode with `skipLibCheck: false`:
+
+| moduleResolution | lowest TypeScript | tested versions |
+|---|---|---|
+| `node16`, `nodenext` (ESM and CJS consumers) | **4.7** | 4.7, 5.0, 5.4, 5.9, 6.0, 7.0 |
+| `bundler` | **5.0** | 5.0, 5.4, 5.9, 6.0, 7.0 |
+
+Each version runs with `@types/react` 18 and 19. These floors are TypeScript's own: 4.7 added `node16`/`nodenext` and package `exports` support, and 5.0 added `bundler`. The current placeholder API doesn't raise them. The floor may go up as the 1.0 API lands; this table and the CI matrix will change with it.
+
 ## Repository layout
 
 ```
@@ -27,6 +38,7 @@ npm run typecheck
 npm test
 npm run build      # library (tsdown) + playground (Vite)
 npm run smoke      # packs the library and checks ESM import, CJS require and types
+npm run consumer-ts -- --ts 5.0,7.0 --react 19   # consumer type-check matrix (see TypeScript support)
 ```
 
 CI runs the tests on Node 22 and 24 against React 17, 18 and 19. To try another React major locally: `node scripts/use-react.mjs 17` (it rewrites dev ranges and node_modules; restore with `git checkout -- package-lock.json '*/*/package.json' && npm ci`).
