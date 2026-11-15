@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["vite/client", "node"],
+    "paths": {
+      "react-data-export": ["../../packages/react-data-export/src/index.ts"]
+    }
+  },
+  "include": ["src", "vite.config.ts"]
+}

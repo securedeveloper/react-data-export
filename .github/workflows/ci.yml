@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Node ${{ matrix.node }} / React ${{ matrix.react }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [22, 24]
+        react: [17, 18, 19]
+    env:
+      # Asserted by the test suite, so a job can't silently run on the wrong React.
+      REACT_MAJOR: ${{ matrix.react }}
+      SMOKE_REACT: ${{ matrix.react }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      # React 19 is the committed default: install exactly from the lockfile.
+      - name: Install (lockfile)
+        if: matrix.react == 19
+        run: npm ci
+
+      # React 17/18: rewrite the dev ranges and resolve a fresh tree (see the script).
+      - name: Install (React ${{ matrix.react }})
+        if: matrix.react != 19
+        run: node scripts/use-react.mjs ${{ matrix.react }}
+
+      - name: Resolved versions
+        run: node scripts/print-versions.mjs
+
+      - name: Typecheck (library + playground)
+        if: matrix.react == 19
+        run: npm run typecheck
+
+      - name: Typecheck (library)
+        if: matrix.react != 19
+        run: npm run typecheck -w react-data-export
+
+      - name: Test
+        run: npm test
+
+      - name: Build library
+        run: npm run build -w react-data-export
+
+      - name: Lint package (publint + are-the-types-wrong)
+        if: matrix.react == 19
+        run: npm run lint:pkg
+
+      - name: Smoke test packed tarball (ESM, CJS, types)
+        run: npm run smoke
+
+      - name: Build playground
+        if: matrix.react == 19
+        run: npm run build -w playground
+
+      - name: npm pack --dry-run
+        if: matrix.react == 19 && matrix.node == 24
+        run: npm pack --dry-run -w react-data-export

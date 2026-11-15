@@ -1,8 +1,23 @@
-.DS_Store
-node_modules
-*.log
-.idea/
-.nyc_output/
+# dependencies
+node_modules/
+
+# build output
+dist/
 coverage/
-package-lock.json
-yarn.lock
+*.tgz
+
+# logs and OS files
+*.log
+.DS_Store
+.idea/
+.vscode/
+
+# local env
+.env
+.env.*.local
+
+# local-only agent files
+.claude/
+CLAUDE.md
+CLAUDE.local.md
+.remember/

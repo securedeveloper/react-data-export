@@ -1,76 +1,24 @@
 {
-  "name": "react-data-export",
-  "version": "0.6.0",
-  "main": "dist/index.js",
-  "types": "types/index.d.ts",
-  "description": "A set of tools to export dataset from react to different formats.",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/securedeveloper/react-data-export.git"
-  },
-  "keywords": [
-    "react-data-export",
-    "react-dataset",
-    "react-export",
-    "react-excel-export"
-  ],
-  "author": "Afzal Ahmad <securedeveloper@gmail.com>",
+  "name": "react-data-export-workspace",
+  "private": true,
+  "description": "Workspace for react-data-export 1.0 (library + playground).",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/securedeveloper/react-data-export/issues"
-  },
-  "homepage": "https://github.com/securedeveloper/react-data-export#readme",
-  "dependencies": {
-    "file-saver": "1.3.3",
-    "tempa-xlsx": "0.0.1"
-  },
-  "devDependencies": {
-    "@commitlint/cli": "6.1.3",
-    "@commitlint/config-conventional": "6.1.3",
-    "babel-cli": "6.26.0",
-    "babel-core": "^6.26.3",
-    "babel-eslint": "8.0.1",
-    "babel-jest": "22.4.1",
-    "babel-plugin-transform-class-properties": "6.24.1",
-    "babel-preset-es2015": "6.24.1",
-    "babel-preset-react": "6.24.1",
-    "babel-register": "6.26.0",
-    "cross-env": "5.1.0",
-    "enzyme": "^3.6.0",
-    "enzyme-adapter-react-16": "^1.5.0",
-    "eslint": "4.18.2",
-    "eslint-plugin-import": "2.7.0",
-    "eslint-plugin-jest": "21.14.0",
-    "eslint-plugin-jsx-a11y": "6.0.2",
-    "eslint-plugin-react": "7.4.0",
-    "eslint-watch": "3.1.3",
-    "husky": "0.15.0-rc.13",
-    "jest": "^23.6.0",
-    "jest-environment-node": "22.4.1",
-    "nyc": "11.2.1",
-    "prop-types": "15.6.0",
-    "react": "16.0.0",
-    "react-dom": "16.0.1",
-    "standard-version": "^4.4.0",
-    "xlsx": "^0.14.0"
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=20"
   },
   "scripts": {
-    "commitmsg": "commitlint -e $GIT_PARAMS",
-    "release": "standard-version",
-    "test": "npm run lint && jest .",
-    "test:coverage": "nyc npm t",
-    "coverage:html": "nyc report --reporter=html",
-    "coverage:publish": "nyc report --reporter=lcov | codecov",
-    "clean": "rm -rf ./dist && mkdir ./dist",
-    "build": "npm run test && babel src --out-dir dist",
-    "build:watch": "babel -w src --out-dir dist",
-    "lint": "eslint .",
-    "lint:watch": "esw -w lib/**",
-    "prepare": "npm run build"
+    "build": "npm run build -w react-data-export && npm run build -w playground",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm test -w react-data-export",
+    "lint:pkg": "npm run lint:pkg -w react-data-export",
+    "smoke": "node scripts/smoke.mjs"
   },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "typescript": "^5.9.3"
   }
 }
