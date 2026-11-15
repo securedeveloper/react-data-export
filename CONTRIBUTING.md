@@ -10,7 +10,7 @@ cd react-data-export
 npm ci
 ```
 
-Use Node 22 or 24 (`.nvmrc` pins 24).
+Use Node 22.22.2+ or 24.15+ (`.nvmrc` pins 24). Older 22.x/24.x releases are below the jsdom and tsdown engine floors.
 
 ## Before opening a PR
 

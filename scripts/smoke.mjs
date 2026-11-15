@@ -5,12 +5,14 @@ import { execFileSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 
 const root = resolve(import.meta.dirname, '..');
 const pkgDir = join(root, 'packages/react-data-export');
 const pkg = JSON.parse(readFileSync(join(pkgDir, 'package.json'), 'utf8'));
-const tsc = createRequire(import.meta.url).resolve('typescript/bin/tsc');
+// TypeScript 7 no longer exports `./bin/tsc`, so locate the bin via its package.json.
+const tsPkgPath = createRequire(import.meta.url).resolve('typescript/package.json');
+const tsc = join(dirname(tsPkgPath), JSON.parse(readFileSync(tsPkgPath, 'utf8')).bin.tsc);
 const reactRange = process.env.SMOKE_REACT ?? '19';
 
 const run = (cmd, args, cwd) =>
