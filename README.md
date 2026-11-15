@@ -38,6 +38,10 @@ npm run consumer-ts -- --ts 5.0,7.0 --react 19   # consumer type-check matrix (s
 
 CI runs the tests on Node 22 and 24 against React 17, 18 and 19. To try another React major locally: `node scripts/use-react.mjs 17` (it rewrites dev ranges and node_modules; restore with `git checkout -- package-lock.json '*/*/package.json' && npm ci`).
 
+## Releasing
+
+Versions are managed with [Changesets](https://github.com/changesets/changesets). Merging a pull request that bumps the version publishes it to npm. See [RELEASING.md](RELEASING.md).
+
 ## License
 
 [MIT](LICENSE)

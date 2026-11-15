@@ -1,0 +1,76 @@
+# Publishes to npm when a merge to main changes the package version.
+#
+# Shared verbatim by javascript-excel, react-data-export, react-data-import and
+# react-xlsx-viewer; only PACKAGE_DIR differs. npm trusted publishing (OIDC)
+# authenticates this exact file name, so it must stay `release.yml`, must not
+# be called through workflow_call, and needs no NPM_TOKEN. Provenance is
+# attached automatically. See RELEASING.md.
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write # git tag + GitHub Release
+  id-token: write # npm trusted publishing
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  PACKAGE_DIR: packages/react-data-export
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    environment: npm
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      - name: Detect release
+        id: check
+        run: node scripts/release-check.mjs --package "$PACKAGE_DIR" --notes-out "$RUNNER_TEMP/release-notes.md"
+
+      - name: Install
+        if: steps.check.outputs.release == 'true'
+        run: npm ci
+
+      - name: Verify (typecheck, test, build)
+        if: steps.check.outputs.release == 'true'
+        run: |
+          npm run typecheck --if-present
+          npm test --if-present
+          npm run build --if-present
+
+      - name: Publish to npm
+        if: steps.check.outputs.release == 'true'
+        run: npm publish "./$PACKAGE_DIR" --tag "${{ steps.check.outputs.dist-tag }}"
+
+      # Runs whenever the version changed, not only when this run published:
+      # a re-run after a successful publish but a failed `gh release create`
+      # then still creates the tag and Release. Already there: no-op.
+      - name: Tag and GitHub Release
+        if: steps.check.outputs.version-changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.check.outputs.version }}
+          PRERELEASE: ${{ steps.check.outputs.prerelease }}
+        run: |
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            echo "Release v$VERSION already exists"
+            exit 0
+          fi
+          flags=()
+          if [ "$PRERELEASE" = "true" ]; then flags+=(--prerelease); else flags+=(--latest); fi
+          gh release create "v$VERSION" --target "$GITHUB_SHA" --title "v$VERSION" \
+            --notes-file "$RUNNER_TEMP/release-notes.md" "${flags[@]}"
