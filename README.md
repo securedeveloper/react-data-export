@@ -11,14 +11,9 @@ Export data from React to `.xlsx` and `.csv`.
 
 ## TypeScript support
 
-Types ship with the package (`.d.ts` for `import`, `.d.cts` for `require`). CI type-checks a consumer project against the packed tarball, in strict mode with `skipLibCheck: false`:
+Types ship with the package (`.d.ts` for `import`, `.d.cts` for `require`). CI type-checks a consumer project against the packed tarball, in strict mode with `skipLibCheck: false`.
 
-| moduleResolution | lowest TypeScript | tested versions |
-|---|---|---|
-| `node16`, `nodenext` (ESM and CJS consumers) | **4.7** | 4.7, 5.0, 5.4, 5.9, 6.0, 7.0 |
-| `bundler` | **5.0** | 5.0, 5.4, 5.9, 6.0, 7.0 |
-
-Each version runs with `@types/react` 18 and 19. These floors are TypeScript's own: 4.7 added `node16`/`nodenext` and package `exports` support, and 5.0 added `bundler`. The current placeholder API doesn't raise them. The floor may go up as the 1.0 API lands; this table and the CI matrix will change with it.
+**Supported: TypeScript 5.0 and later**, with `moduleResolution` `node16`, `nodenext` (ESM and CommonJS consumers) or `bundler`. Every minor from 5.0 to 5.9, plus 6.0 and 7.0, is tested with `@types/react` 18 and 19. If the 1.0 API ever needs a newer TypeScript, this floor and the CI matrix will change together.
 
 ## Repository layout
 

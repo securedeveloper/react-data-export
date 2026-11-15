@@ -106,12 +106,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ts: ['5.0', '5.4', '5.9', '6.0', '7.0']
+        # Every minor from the supported floor (5.0) up, same set as javascript-excel.
+        ts: ['5.0', '5.1', '5.2', '5.3', '5.4', '5.5', '5.6', '5.7', '5.8', '5.9', '6.0', '7.0']
         react: [18, 19]
-        include:
-          # The measured floor: TS 4.7 introduced node16/nodenext; `bundler` needs 5.0.
-          - { ts: '4.7', react: 18, resolutions: 'node16,nodenext' }
-          - { ts: '4.7', react: 19, resolutions: 'node16,nodenext' }
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -129,7 +126,7 @@ jobs:
           --tarball pack/react-data-export.tgz
           --ts ${{ matrix.ts }}
           --react ${{ matrix.react }}
-          --resolution ${{ matrix.resolutions || 'node16,nodenext,bundler' }}
+          --resolution node16,nodenext,bundler
 
   # Single stable name to mark as a required check.
   consumer-ts-result:

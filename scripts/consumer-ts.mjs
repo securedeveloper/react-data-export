@@ -13,14 +13,14 @@
 //   - a CommonJS .cts consumer (node16/nodenext only; bundler has no CJS mode)
 //   - @ts-expect-error probes that fail if the package's types resolve to `any`
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 
 const { values } = parseArgs({
   options: {
-    ts: { type: 'string', default: process.env.CONSUMER_TS ?? '5.0,5.4,5.9,7.0' },
+    ts: { type: 'string', default: process.env.CONSUMER_TS ?? '5.0,5.1,5.2,5.3,5.4,5.5,5.6,5.7,5.8,5.9,6.0,7.0' },
     react: { type: 'string', default: process.env.CONSUMER_REACT ?? '18,19' },
     resolution: { type: 'string', default: process.env.CONSUMER_RESOLUTION ?? 'node16,nodenext,bundler' },
     tarball: { type: 'string', default: process.env.CONSUMER_TARBALL },
@@ -134,11 +134,14 @@ for (const ts of tsVersions) {
   }
 }
 
-console.log('\n| TypeScript | @types/react | moduleResolution | result |');
-console.log('|---|---|---|---|');
-for (const r of results) {
-  console.log(`| ${r.tsResolved ?? r.ts} | ${r.typesReact ?? r.react} | ${r.resolution} | ${r.ok ? 'pass' : 'FAIL'} |`);
-}
+const table = [
+  '| TypeScript | @types/react | moduleResolution | result |',
+  '|---|---|---|---|',
+  ...results.map((r) => `| ${r.tsResolved ?? r.ts} | ${r.typesReact ?? r.react} | ${r.resolution} | ${r.ok ? 'pass' : 'FAIL'} |`),
+].join('\n');
+console.log(`\n${table}`);
+// In GitHub Actions, also show the table on the run's summary page.
+if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${table}\n`);
 const failed = results.filter((r) => !r.ok);
 for (const r of failed) {
   console.log(`\n--- FAIL: TS ${r.tsResolved ?? r.ts}, @types/react ${r.typesReact ?? r.react}, ${r.resolution}\n${r.detail}`);
