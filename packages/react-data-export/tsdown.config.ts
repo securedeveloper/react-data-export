@@ -9,7 +9,7 @@ const config: UserConfig = defineConfig({
   platform: 'neutral',
   target: 'es2020',
   dts: true,
-  sourcemap: true,
+  sourcemap: false,
   clean: true,
 });
 
