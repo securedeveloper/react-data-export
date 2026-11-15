@@ -1,6 +1,8 @@
+import type { ReactElement } from 'react';
 import { useVersion } from 'react-data-export';
 
-export function App() {
+// Exported components need an explicit return type under isolatedDeclarations.
+export function App(): ReactElement {
   const version = useVersion();
   return (
     <main style={{ fontFamily: 'system-ui, sans-serif', maxWidth: 640, margin: '4rem auto', padding: '0 1rem' }}>

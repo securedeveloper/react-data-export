@@ -1,10 +1,10 @@
 import { fileURLToPath } from 'node:url';
 import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
+import { defineConfig, type UserConfig } from 'vite';
 
 // Resolve the library from source so the playground always matches the branch
 // it is built from, without a separate package build step.
-export default defineConfig({
+const config: UserConfig = defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
@@ -14,3 +14,5 @@ export default defineConfig({
     },
   },
 });
+
+export default config;
