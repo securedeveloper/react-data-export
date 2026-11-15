@@ -9,6 +9,12 @@ Export data from React to `.xlsx` and `.csv`.
 - **0.6.x stays on npm unchanged.** `npm install react-data-export@0.6` keeps working; nothing is unpublished or deprecated.
 - **Legacy code and docs** (0.x README, examples, Babel/Jest setup) live at the [`v0.6.0` tag](https://github.com/securedeveloper/react-data-export/tree/v0.6.0).
 
+## TypeScript support
+
+Types ship with the package (`.d.ts` for `import`, `.d.cts` for `require`). CI type-checks a consumer project against the packed tarball, in strict mode with `skipLibCheck: false`.
+
+**Supported: TypeScript 5.0 and later**, with `moduleResolution` `node16`, `nodenext` (ESM and CommonJS consumers) or `bundler`. Every minor from 5.0 to 5.9, plus 6.0 and 7.0, is tested with `@types/react` 18 and 19. If the 1.0 API ever needs a newer TypeScript, this floor and the CI matrix will change together.
+
 ## Repository layout
 
 ```
@@ -27,6 +33,7 @@ npm run typecheck
 npm test
 npm run build      # library (tsdown) + playground (Vite)
 npm run smoke      # packs the library and checks ESM import, CJS require and types
+npm run consumer-ts -- --ts 5.0,7.0 --react 19   # consumer type-check matrix (see TypeScript support)
 ```
 
 CI runs the tests on Node 22 and 24 against React 17, 18 and 19. To try another React major locally: `node scripts/use-react.mjs 17` (it rewrites dev ranges and node_modules; restore with `git checkout -- package-lock.json '*/*/package.json' && npm ci`).
