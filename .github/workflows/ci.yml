@@ -137,3 +137,42 @@ jobs:
     steps:
       - name: All consumer TypeScript cells passed
         run: test "${{ needs.consumer-ts.result }}" = success
+
+  release-dry-run:
+    name: Release dry run
+    runs-on: ubuntu-latest
+    env:
+      PACKAGE_DIR: packages/react-data-export
+    steps:
+      # On a pull_request, HEAD is the test merge commit and HEAD~1 is the
+      # base branch tip, so the release check below previews what merging
+      # this PR would do.
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Release script unit tests
+        run: node --test "scripts/*.test.mjs"
+      - name: Release preview (what merging this would publish)
+        id: check
+        run: node scripts/release-check.mjs --package "$PACKAGE_DIR"
+      - run: npm run build
+      - name: npm pack --dry-run
+        run: npm pack "./$PACKAGE_DIR" --dry-run
+      - name: npm publish --dry-run
+        env:
+          PUBLISHED: ${{ steps.check.outputs.published }}
+          DIST_TAG: ${{ steps.check.outputs.dist-tag }}
+        run: |
+          if [ "$PUBLISHED" = "true" ]; then
+            # npm refuses even a dry run over a version that is already on
+            # npm, so dry-run a throwaway prerelease of it instead (this
+            # checkout is discarded after the job).
+            (cd "$PACKAGE_DIR" && npm version prerelease --preid dryrun --no-git-tag-version --ignore-scripts --workspaces-update=false)
+            DIST_TAG=next
+          fi
+          npm publish "./$PACKAGE_DIR" --dry-run --tag "$DIST_TAG"
