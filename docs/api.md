@@ -1,6 +1,6 @@
 # react-data-export 1.0: API design (dataset module)
 
-Status: **design for review**. Nothing here is implemented yet. The code (RDE-1.9) is written against a published javascript-excel 2.0 prerelease that contains `fromDataset` and `javascript-excel/dom` (see [§9](#9-dependencies-and-order)).
+Status: **design for review**. Nothing here is implemented yet. The code (RDE-1.9) needs **javascript-excel ≥ 2.0.0-alpha.2**, the first prerelease with `fromDataset`/`fromDatasets` (see [§9](#9-dependencies-and-order)).
 
 This document covers module A, **dataset export**: `exportDataset`, `exportWorkbook`, `useExcelExport` and `<ExcelExport>`. Module B, table export (`exportTable`, `useTableExport`, `<ExportTableButton>`), gets its own section in a later change (RDE-1.17).
 
@@ -275,13 +275,13 @@ export function ExcelExport(props: ExcelExportProps): ReactElement;
 
 | needs | from javascript-excel | status today |
 |---|---|---|
-| `Dataset`, `ColumnDef`, `DatasetOptions`, `fromDataset`, `fromDatasets` | core entry, its §4.3 | **specified, not implemented yet**; not in 2.0.0-alpha.1 |
+| `Dataset`, `ColumnDef`, `DatasetOptions`, `fromDataset`, `fromDatasets` | core entry, its §4.3 | **2.0.0-alpha.2** (JSE-14, planned); not in 2.0.0-alpha.1 |
 | `toBlob`, `WriteOptions`, `Progress`, `DocProperties`, `isExcelError`, `sanitizeSheetName` | core entry, §5.1 / §4.6 / §7 | implemented (2.0.0-alpha.1) |
 | `toCsvBlob`, `CsvWriteOptions` | `javascript-excel/csv`, §5.3 | implemented (2.0.0-alpha.1) |
-| `download` | `javascript-excel/dom`, §5.4 | in progress (JSE-7) |
+| `download` | `javascript-excel/dom`, §5.4 | implemented (JSE-7); in 2.0.0-alpha.1 |
 | `WorkerClient` (1.x only) | `javascript-excel/worker`, §5.5 | planned (JSE-8) |
 
-So the RDE-1.9 code starts once a javascript-excel prerelease with `fromDataset`/`fromDatasets` and `download` is on npm. react-data-export then depends on that exact prerelease line, for example `"javascript-excel": "^2.0.0-alpha.N"`. Until then, only this design and its review happen. Writing a temporary `fromDataset` in React would duplicate the engine, which the principles rule out.
+So the RDE-1.9 code starts once **javascript-excel 2.0.0-alpha.2** is on npm. react-data-export then depends on `"javascript-excel": "^2.0.0-alpha.2"` ([Q6](#12-open-questions)). Until then, only this design and its review happen. Writing a temporary `fromDataset` in React would duplicate the engine, which the principles rule out.
 
 ## 10. Feature coverage
 
@@ -325,5 +325,5 @@ Each one has a recommendation. Decided answers move into the sections above.
 - **Q3. `"use client"` on the whole entry** (§8). *Recommended.* Alternative: a separate `react-data-export/core` entry without the directive, for the plain functions. It's only useful if someone needs `exportDataset(…, { download: false })` in a server context, where javascript-excel itself is the better fit.
 - **Q4. Abort running exports on unmount** (§5). *Recommended* as the default. Alternative: let them finish and only skip state updates, or make it an option (`abortOnUnmount`).
 - **Q5. `<ExcelExport>` triggers: render prop plus default button, no `cloneElement`** (§6). *Recommended.* Alternative: 0.x-style `element` that gets an injected `onClick`. That's fragile with components that don't forward `onClick` or that are fragments.
-- **Q6. Dependency range on javascript-excel during the 2.0 prereleases.** `^2.0.0-alpha.N` (caret on a prerelease only matches later prereleases of 2.0.0 and 2.0.0 itself). *Recommended.* Alternative: an exact pin, bumped with each alpha.
+- **Q6. Dependency range on javascript-excel during the 2.0 prereleases.** `^2.0.0-alpha.2` (caret on a prerelease only matches later prereleases of 2.0.0 and 2.0.0 itself). *Recommended.* Alternative: an exact pin, bumped with each alpha.
 - **Q7. Accessor fields.** Pass javascript-excel's `key` / `path` / `value` / `index` through unchanged (§3). *Recommended*: one documented shape for every framework, and no ambiguity about `'a.b'`. Alternative: a single react-data-export field that accepts both keys and paths and maps to `key` or `path`. javascript-excel's Q18 allows this, but it adds a translation layer and an ambiguity.
