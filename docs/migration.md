@@ -18,6 +18,7 @@ Every 1.0 snippet below is a file in [`examples/migration/`](../examples/migrati
    - [3.5 `element`](#35-element)
    - [3.6 `fileExtension` and `filename`](#36-fileextension-and-filename)
    - [3.7 Cell styles](#37-cell-styles)
+   - [3.8 New: export a table that is already on the page](#38-new-export-a-table-that-is-already-on-the-page)
 4. [Behaviour differences](#4-behaviour-differences)
 5. [Not carried over](#5-not-carried-over)
 
@@ -57,6 +58,7 @@ npm install react-data-export@next     # 1.0 prereleases go to the `next` tag; n
 | `fileExtension="xlsx"` / `"csv"` | `format="xlsx"` / `"csv"` | [3.6](#36-fileextension-and-filename) |
 | `fileExtension="txt"` / `"xls"` / `"html"` | CSV with a tab delimiter / `xlsx` / none | [3.6](#36-fileextension-and-filename) |
 | cell `{ value, style }` | the same, with javascript-excel style keys | [3.7](#37-cell-styles) |
+| a `<table>` on the page plus the same rows in `<ExcelFile>` | `<ExportTableButton tableRef>`, which exports the table itself | [3.8](#38-new-export-a-table-that-is-already-on-the-page) |
 | `font.sz`, `fill.patternType`/`fgColor`, `alignment.textRotation` | `font.size`, `fill: 'RRGGBB'` or `{ pattern, fgColor }`, `alignment.rotation` | [3.7](#37-cell-styles) |
 
 ## 3. Side by side
@@ -606,6 +608,59 @@ const cell = { value: 'Red', style: convertLegacyStyle({ fill: { patternType: 's
 ```
 
 Styles also cascade in 1.0: a column's `style` applies to every data cell in the column, a `rowStyle` function styles whole rows, and a cell's own `style` is merged on top.
+
+### 3.8 New: export a table that is already on the page
+
+0.x had no table export, so apps that showed a `<table>` also passed the same rows to `<ExcelFile>`. In 1.0 you can export the rendered table directly. Its header rows, `colspan`/`rowspan` merges and links are kept, and hidden rows and `[data-export-ignore]` cells are skipped:
+
+<!-- example: examples/migration/table-export.tsx -->
+```tsx
+import { useRef } from 'react';
+import { ExportTableButton } from 'react-data-export';
+
+interface Order {
+  id: string;
+  customer: string;
+  total: number;
+}
+
+// 0.x apps often rendered a <table> and passed the same rows to <ExcelFile> again.
+// In 1.0 the rendered table can be exported as it is.
+export function Orders({ orders }: { orders: Order[] }) {
+  const ref = useRef<HTMLTableElement>(null);
+  return (
+    <>
+      <table ref={ref}>
+        <thead>
+          <tr>
+            <th>Order</th>
+            <th>Customer</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {orders.map((o) => (
+            <tr key={o.id}>
+              <td>{o.id}</td>
+              <td>{o.customer}</td>
+              <td data-type="number" data-numfmt="#,##0.00">
+                {o.total.toFixed(2)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <ExportTableButton tableRef={ref} filename="orders" name="Orders" freezeHeader autoWidth>
+        Download orders.xlsx
+      </ExportTableButton>
+    </>
+  );
+}
+```
+
+- `data-type`, `data-value` and `data-numfmt` on a cell give it a real type and number format, so a total is exported as a number, not as text. `styles: 'computed'` carries the table's CSS (colours, bold, alignment) into the file.
+- `useTableExport(ref)` and `exportTable(element)` are the hook and the plain function, with the same options. See [api.md §13](api.md#13-table-export).
+- Exporting a dataset is still the better fit when the file needs columns the page doesn't show, or when the table is paginated or virtualised (only the rendered rows are in the DOM).
 
 ## 4. Behaviour differences
 
