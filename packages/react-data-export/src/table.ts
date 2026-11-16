@@ -6,7 +6,7 @@ import {
   collecting,
   formatOf,
   splitOptions,
-  throwIfAborted,
+  startExport,
   writeAndSave,
   type ExportOptions,
   type ExportResult,
@@ -39,7 +39,7 @@ export async function exportTable(
 ): Promise<ExportResult> {
   const { exportOptions, rest } = splitOptions(options);
   const format = formatOf(exportOptions);
-  throwIfAborted(exportOptions.signal);
+  await startExport(exportOptions.signal);
   const el = resolveTable(table);
   const warnings: ExcelWarning[] = [];
   const sheet = fromTable(el, { ...rest, onWarning: collecting(warnings, rest.onWarning) });

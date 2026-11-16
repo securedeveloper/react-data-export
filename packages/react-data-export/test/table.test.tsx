@@ -2,7 +2,7 @@
 // javascript-excel fromTable and writer run; only the browser download is
 // mocked. Files are read back with javascript-excel/read.
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { useRef, useState } from 'react';
+import { StrictMode, useEffect, useRef, useState } from 'react';
 import { download } from 'javascript-excel/dom';
 import { read } from 'javascript-excel/read';
 import { ExportTableButton, exportTable, useTableExport, type ExportResult, type UseTableExport } from '../src/index';
@@ -202,6 +202,37 @@ function ButtonPage(props: { onExported?: (r: ExportResult) => void; onError?: (
     </div>
   );
 }
+
+describe('useTableExport under StrictMode', () => {
+  it.each(['xlsx', 'csv'] as const)('an export started on mount (%s) downloads exactly once', async (format) => {
+    const results: string[] = [];
+    function AutoTable() {
+      const ref = useRef<HTMLTableElement>(null);
+      const hook = useTableExport(ref);
+      useEffect(() => {
+        hook.exportTable({ filename: 'auto', format }).then(
+          (r) => results.push(r.filename),
+          () => undefined, // StrictMode's simulated unmount aborts the first run
+        );
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, []);
+      return (
+        <div>
+          <table ref={ref} dangerouslySetInnerHTML={{ __html: TABLE_HTML }} />
+          <output data-testid="auto">{hook.status}</output>
+        </div>
+      );
+    }
+    render(
+      <StrictMode>
+        <AutoTable />
+      </StrictMode>,
+    );
+    await waitFor(() => expect(screen.getByTestId('auto').textContent).toBe('done'));
+    expect(results).toEqual([`auto.${format}`]);
+    expect(downloadMock).toHaveBeenCalledTimes(1);
+  });
+});
 
 describe('<ExportTableButton>', () => {
   it('renders a default "Export" button that exports the table', async () => {

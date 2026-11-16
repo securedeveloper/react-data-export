@@ -96,6 +96,22 @@ export function throwIfAborted(signal: AbortSignal | undefined): void {
   }
 }
 
+/**
+ * Internal: the start of every export (dataset, workbook, table). Checks the
+ * signal, yields once, and checks it again before anything is built.
+ *
+ * The yield matters for CSV: toCsvBlob is synchronous, so without it a CSV
+ * export (build, write, download) would finish inside the caller's turn. An
+ * export started in an effect under React 18/19 StrictMode would then
+ * download before the simulated unmount could abort it, giving two files.
+ * xlsx already awaits toBlob, so this only changes when CSV work starts.
+ */
+export async function startExport(signal: AbortSignal | undefined): Promise<void> {
+  throwIfAborted(signal);
+  await Promise.resolve();
+  throwIfAborted(signal);
+}
+
 /** Wraps onWarning so every warning is also collected for the result. Internal. */
 export function collecting(
   warnings: ExcelWarning[],
@@ -139,7 +155,7 @@ export async function exportDataset<T>(
 ): Promise<ExportResult> {
   const { exportOptions, rest } = splitOptions(options);
   const format = formatOf(exportOptions);
-  throwIfAborted(exportOptions.signal);
+  await startExport(exportOptions.signal);
   const warnings: ExcelWarning[] = [];
   const sheet = fromDataset(dataset, { ...rest, onWarning: collecting(warnings, rest.onWarning) });
   return writeAndSave([sheet], undefined, warnings, exportOptions, format);
@@ -152,7 +168,7 @@ export async function exportWorkbook(spec: WorkbookSpec, options: ExportOptions 
   if (format === 'csv' && specs.length !== 1) {
     throw new TypeError(`react-data-export: a CSV file holds one sheet; this workbook has ${specs.length}`);
   }
-  throwIfAborted(options.signal);
+  await startExport(options.signal);
   const warnings: ExcelWarning[] = [];
   const sheets = specs.map((s) => {
     if ('blocks' in s) {

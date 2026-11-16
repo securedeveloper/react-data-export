@@ -260,7 +260,7 @@ export function ExcelExport(props: ExcelExportProps): ReactElement;
   - `ValidationError` (`INVALID_COLUMN`, `INVALID_SHEET_NAME`, `INVALID_NUMBER`, …), `EnvironmentError` (`ENVIRONMENT_UNSUPPORTED`) and `LimitError` come through unchanged.
   - Check them with the re-exported `isExcelError(err)` or `err.code`, not `instanceof`: javascript-excel ships ESM and CJS, and the two copies' classes differ.
   - react-data-export's own misuse errors (CSV with several sheets, `dataset` and `workbook` both or neither, an unknown `format`) are `TypeError`s. That's how javascript-excel treats invalid options too.
-- **Abort.** `signal` reaches `toBlob`, which checks it between sheet chunks. It is also checked before building and before the download starts. An abort rejects with `signal.reason` (a `DOMException` `AbortError` by default). `toCsvBlob` is synchronous, so a CSV export can only be aborted before it starts.
+- **Abort.** `signal` reaches `toBlob`, which checks it between sheet chunks. It is also checked before building and before the download starts. Every export starts by yielding once (one microtask) and re-checking the signal before it builds anything. `toCsvBlob` is synchronous, so without that yield a CSV export started in an effect would finish, download included, before React 18/19 StrictMode's simulated unmount could abort it, and the documented auto-export recipe would save the file twice in development. An abort rejects with `signal.reason` (a `DOMException` `AbortError` by default). `toCsvBlob` is synchronous, so a CSV export can only be aborted before it starts.
 - **Progress.** `onProgress` receives javascript-excel's `Progress` (`phase`, `sheet`, `ratio` from 0 to 1, non-decreasing) from `toBlob`. The building phase (`fromDataset`) is synchronous and reports nothing, so the first progress event comes from the writer. CSV reports no progress.
 - **Big data.** Large exports run on the main thread in 1.0. Off-main-thread writing comes with javascript-excel's worker entry (its JSE-8):
   - `fromDataset` has to run on the main thread, because accessors are functions and can't be sent to a worker.
@@ -393,7 +393,7 @@ const ref = useRef<HTMLTableElement>(null);
   - `TableRef` is structural (`{ readonly current }`), so `useRef<HTMLTableElement>(null)` from @types/react 17, 18 and 19 fits without depending on any of them.
   - **Callback refs are not supported.** Use an object ref.
   - **An empty ref** (`current` is `null`: not rendered yet, or unmounted) rejects with a `TypeError` before anything is built.
-- **Order of checks:** the format, then the signal, then the element, then build, write, the signal again, and the download.
+- **Order of checks:** the format, then the signal, one yield (§7), the signal again, then the element, build, write, the signal again, and the download.
 - **SSR.** Importing stays side-effect free. On the server there's no table, so a table export can only start in the browser. Exporting from a server render is not a use case: the table is in the user's DOM.
 - **Hook and component:** these are `useExcelExport` and `<ExcelExport>` with a ref instead of data. They share the same state, abort and unmount behaviour (§5) and the same trigger and `run()` contract (§6), through one internal implementation, so the two can't drift. Unlike `<ExcelExport>`, `<ExportTableButton>` always has its single target, `tableRef`, so there's no "exactly one of" check.
 - **Errors** are javascript-excel's, unchanged (§7), for example `INVALID_SHEET_NAME` for a bad `name`.
