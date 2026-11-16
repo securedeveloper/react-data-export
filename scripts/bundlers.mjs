@@ -78,6 +78,9 @@ const CHECKS = {
       if (!html) throw new Error(`${script}: no prerendered index.html`);
       const page = readFileSync(html, 'utf8');
       if (!page.includes('Server-rendered page') || !page.includes('Export')) throw new Error(`${script}: prerendered page is missing the export button`);
+      // The table client component rendered on the server too: its colspan header and its <ExportTableButton>.
+      if (!page.includes('colSpan="2"') && !page.includes('colspan="2"')) throw new Error(`${script}: prerendered page is missing the table`);
+      if (!page.includes('Export table')) throw new Error(`${script}: prerendered page is missing <ExportTableButton>`);
       notes.push(`${script === 'build' ? 'webpack' : 'turbopack'}: prerendered, ${scanClientBundle(join(app, '.next/static'))}`);
     }
     return notes.join('; ');

@@ -1,5 +1,6 @@
+import { useRef } from "react";
 import ReactDOM from "react-dom";
-import { ExcelExport, useExcelExport, type ExcelExportProps } from "react-data-export";
+import { ExcelExport, exportTable, useExcelExport, type ExcelExportProps, type ExportResult } from "react-data-export";
 
 interface Row {
   name: string;
@@ -16,12 +17,37 @@ function HookButton() {
   return <button onClick={() => void exportDataset<Row>({ columns: dataset.columns, data: [{ name: "Grace", total: 980 }] })}>Hook export ({status})</button>;
 }
 
+// React 17's useRef<T>(null) is a RefObject<T> with a `current: T | null`; exportTable takes it as is.
+function TableCsv() {
+  const ref = useRef<HTMLTableElement>(null);
+  const save = (): Promise<ExportResult> => exportTable(ref, { format: "csv", filename: "table" });
+  return (
+    <>
+      <table ref={ref}>
+        <thead>
+          <tr>
+            <th colSpan={2}>Totals</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Ada</td>
+            <td>1250.5</td>
+          </tr>
+        </tbody>
+      </table>
+      <button onClick={() => void save()}>Table CSV</button>
+    </>
+  );
+}
+
 ReactDOM.render(
   <>
     <ExcelExport dataset={dataset} filename="react17">
       {({ run, status }) => <button onClick={() => void run()}>Export ({status})</button>}
     </ExcelExport>
     <HookButton />
+    <TableCsv />
   </>,
   document.getElementById("root"),
 );
