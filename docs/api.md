@@ -1,6 +1,6 @@
 # react-data-export 1.0: API design (dataset module)
 
-Status: **design for review**. Nothing here is implemented yet. The code (RDE-1.9) needs **javascript-excel ≥ 2.0.0-alpha.2**, the first prerelease with `fromDataset`/`fromDatasets` (see [§9](#9-dependencies-and-order)).
+Status: **design, decided (2026-11-16)**: every question in [§12](#12-design-decisions) is decided. Nothing here is implemented yet. The code (RDE-1.9) needs **javascript-excel ≥ 2.0.0-alpha.2**, the first prerelease with `fromDataset`/`fromDatasets` (see [§9](#9-dependencies-and-order)).
 
 This document covers module A, **dataset export**: `exportDataset`, `exportWorkbook`, `useExcelExport` and `<ExcelExport>`. Module B, table export (`exportTable`, `useTableExport`, `<ExportTableButton>`), gets its own section in a later change (RDE-1.17).
 
@@ -17,7 +17,7 @@ This document covers module A, **dataset export**: `exportDataset`, `exportWorkb
 9. [Dependencies and order](#9-dependencies-and-order)
 10. [Feature coverage](#10-feature-coverage)
 11. [From 0.x](#11-from-0x)
-12. [Open questions](#12-open-questions)
+12. [Design decisions](#12-design-decisions)
 
 ---
 
@@ -75,7 +75,7 @@ const people: Dataset<Person> = {
   - `value(row, { rowIndex })`: computed
   - `index`: for array rows
 
-  javascript-excel decided (its §12 Q18) that `key` and `path` stay separate fields, so `'a.b'` is never ambiguous. react-data-export passes them through unchanged rather than adding a combined field (see [Q7](#12-open-questions)).
+  javascript-excel decided (its §12 Q18) that `key` and `path` stay separate fields, so `'a.b'` is never ambiguous. react-data-export passes them through unchanged rather than adding a combined field (see [Q7](#12-design-decisions)).
 - **Cells:** an accessor may return a bare value or a full cell, `{ value, style, formula, hyperlink }`.
 - **Sheet-level options** are javascript-excel's `DatasetOptions`: `name`, `origin`, `header`, `headerStyle`, `freezeHeader`, `autoFilter`, `autoWidth`, `rightToLeft`, `totals`, `rowStyle`, `onWarning`.
 - **Several blocks on one sheet** (what 0.x did with `xSteps`/`ySteps`) use javascript-excel's `fromDatasets`, exposed as `blocks` (§4.2).
@@ -145,7 +145,7 @@ Each step is a javascript-excel call:
    - xlsx: `toBlob({ sheets, activeSheet, properties }, { ...write, signal, onProgress })`.
    - csv: `toCsvBlob(sheet, csv)`.
 
-   CSV is one sheet by definition: `exportWorkbook` with `format: 'csv'` and more than one remaining sheet rejects with a `TypeError` before anything is built ([Q2](#12-open-questions)).
+   CSV is one sheet by definition: `exportWorkbook` with `format: 'csv'` and more than one remaining sheet rejects with a `TypeError` before anything is built ([Q2](#12-design-decisions)).
 3. **Download** (unless `download: false`): `download(blob, filename)` from `javascript-excel/dom`.
 4. **Resolve** with `ExportResult`.
 
@@ -197,7 +197,7 @@ export function useExcelExport(defaults?: ExportOptions): UseExcelExport;
   - Each call gets its own `AbortController`, linked to `options.signal` if one is given.
   - `abort()` aborts all of them. An aborted export rejects with `signal.reason`, as `fetch` does, and doesn't set `error` or `status: 'error'`: aborting is not a failure. The status returns to `'idle'`.
 - **Unmount.**
-  - Running exports are aborted when the component unmounts, so no state update happens after unmount, and a large export doesn't keep running for a screen that is gone ([Q4](#12-open-questions)).
+  - Running exports are aborted when the component unmounts, so no state update happens after unmount, and a large export doesn't keep running for a screen that is gone ([Q4](#12-design-decisions)).
   - Under React 18/19 StrictMode, development mounts, unmounts and remounts effects. The hook tracks "mounted" in an effect (set on mount, cleared on cleanup), so the extra cycle doesn't abort exports started after the final mount.
 - **Auto-export on mount** (0.x `hideElement`) is a recipe, not a prop:
 
@@ -246,7 +246,7 @@ export function ExcelExport(props: ExcelExportProps): ReactElement;
 - It renders no wrapper element, only the default button or what the render prop returns.
 - The data props are read when the export starts. Changing them while an export runs doesn't affect that export.
 - Passing both `dataset` and `workbook`, or neither, is a `TypeError` when `run()` is called, and in development a `console.error` at render.
-- No `element` cloning (0.x's `element` prop). The render prop covers custom triggers without injecting `onClick` into arbitrary elements ([Q5](#12-open-questions)).
+- No `element` cloning (0.x's `element` prop). The render prop covers custom triggers without injecting `onClick` into arbitrary elements ([Q5](#12-design-decisions)).
 
 ## 7. Errors, abort and progress
 
@@ -281,7 +281,7 @@ export function ExcelExport(props: ExcelExportProps): ReactElement;
 | `download` | `javascript-excel/dom`, §5.4 | implemented (JSE-7); in 2.0.0-alpha.1 |
 | `WorkerClient` (1.x only) | `javascript-excel/worker`, §5.5 | planned (JSE-8) |
 
-So the RDE-1.9 code starts once **javascript-excel 2.0.0-alpha.2** is on npm. react-data-export then depends on `"javascript-excel": "^2.0.0-alpha.2"` ([Q6](#12-open-questions)). Until then, only this design and its review happen. Writing a temporary `fromDataset` in React would duplicate the engine, which the principles rule out.
+So the RDE-1.9 code starts once **javascript-excel 2.0.0-alpha.2** is on npm. react-data-export then depends on `"javascript-excel": "^2.0.0-alpha.2"` ([Q6](#12-design-decisions)). Until then, only this design and its review happen. Writing a temporary `fromDataset` in React would duplicate the engine, which the principles rule out.
 
 ## 10. Feature coverage
 
@@ -316,14 +316,20 @@ A preview of the mapping. The full side-by-side guide is RDE-1.12, and 0.6.x sta
 | `fileExtension="xlsx"` | `format: 'xlsx' \| 'csv'` |
 | cell `{ value, style }` with xlsx-style keys (`font.sz`, `fill.fgColor.rgb`) | cell `{ value, style }` with javascript-excel's style keys (its §11.3 table: `font.size`, `fill: 'RRGGBB'`, …) |
 
-## 12. Open questions
+## 12. Design decisions
 
-Each one has a recommendation. Decided answers move into the sections above.
+These were the open questions of the review. Each one is decided, and the sections above state the outcome as the design. The numbering is kept stable, so references such as "§12 Q4" stay valid.
 
-- **Q1. Extension handling.** Append the format's extension unless the name already ends with it (§4.2). *Recommended.* Alternative: always use the name as given.
-- **Q2. CSV with several sheets.** Reject with a `TypeError` (§4.2). *Recommended*, because a CSV file has one table. Alternatives: one file per sheet (several downloads from one call), or a zip of CSVs (a new dependency on zip writing, which javascript-excel keeps internal).
-- **Q3. `"use client"` on the whole entry** (§8). *Recommended.* Alternative: a separate `react-data-export/core` entry without the directive, for the plain functions. It's only useful if someone needs `exportDataset(…, { download: false })` in a server context, where javascript-excel itself is the better fit.
-- **Q4. Abort running exports on unmount** (§5). *Recommended* as the default. Alternative: let them finish and only skip state updates, or make it an option (`abortOnUnmount`).
-- **Q5. `<ExcelExport>` triggers: render prop plus default button, no `cloneElement`** (§6). *Recommended.* Alternative: 0.x-style `element` that gets an injected `onClick`. That's fragile with components that don't forward `onClick` or that are fragments.
-- **Q6. Dependency range on javascript-excel during the 2.0 prereleases.** `^2.0.0-alpha.2` (caret on a prerelease only matches later prereleases of 2.0.0 and 2.0.0 itself). *Recommended.* Alternative: an exact pin, bumped with each alpha.
-- **Q7. Accessor fields.** Pass javascript-excel's `key` / `path` / `value` / `index` through unchanged (§3). *Recommended*: one documented shape for every framework, and no ambiguity about `'a.b'`. Alternative: a single react-data-export field that accepts both keys and paths and maps to `key` or `path`. javascript-excel's Q18 allows this, but it adds a translation layer and an ambiguity.
+**Q1. Extension handling.** Decided (2026-11-16): the format's extension is appended unless the name already ends with it, and the format always decides the extension (§4.2). The alternative, always using the name as given, was not taken.
+
+**Q2. CSV with several sheets.** Decided (2026-11-16): `exportWorkbook` with `format: 'csv'` and more than one remaining sheet rejects with a `TypeError` before anything is built (§4.2), because a CSV file holds one table. Not taken: one file per sheet (several downloads from one call), and a zip of CSVs (which would need zip writing that javascript-excel keeps internal).
+
+**Q3. `"use client"` scope.** Decided (2026-11-16): the directive goes on the whole entry (§8). There is no separate `react-data-export/core` entry. Server-side generation uses javascript-excel directly.
+
+**Q4. Running exports on unmount.** Decided (2026-11-16): `useExcelExport` aborts its running exports when the component unmounts, StrictMode-safe (§5). Not taken: letting them finish while only skipping state updates, and an `abortOnUnmount` option.
+
+**Q5. `<ExcelExport>` triggers.** Decided (2026-11-16): a default button or a render prop, with no `cloneElement` (§6). The 0.x-style `element` with an injected `onClick` is not carried over, because it breaks with components that don't forward `onClick` and with fragments.
+
+**Q6. javascript-excel range during the 2.0 prereleases.** Decided (2026-11-16): `"javascript-excel": "^2.0.0-alpha.2"` (§9). A caret on a prerelease matches only later 2.0.0 prereleases and 2.0.0 itself. An exact pin bumped with each alpha was not taken.
+
+**Q7. Accessor fields.** Decided (2026-11-16): javascript-excel's `key` / `path` / `value` / `index` pass through unchanged (§3). That gives one documented shape for every framework and no ambiguity about `'a.b'`. A combined react-data-export field mapped to `key` or `path`, which javascript-excel's Q18 would allow, was not taken.
