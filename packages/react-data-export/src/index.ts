@@ -34,4 +34,4 @@ export type { FromTableOptions, TableCellElement, TableElement } from 'javascrip
 export { isExcelError, sanitizeSheetName } from 'javascript-excel';
 
 /** The published version of react-data-export. */
-export const version = '1.0.0-alpha.1';
+export const version = '1.0.0-alpha.2';
