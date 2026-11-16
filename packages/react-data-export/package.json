@@ -79,6 +79,6 @@
     "vitest": "^5.1.0"
   },
   "dependencies": {
-    "javascript-excel": "^2.0.0-alpha.2"
+    "javascript-excel": "^2.0.0-alpha.3"
   }
 }
