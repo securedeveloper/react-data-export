@@ -32,6 +32,45 @@ function isAbort(err: unknown): boolean {
   return typeof err === 'object' && err !== null && (err as { name?: unknown }).name === 'AbortError';
 }
 
+/**
+ * Internal (shared with <ExportTableButton>): runs an export for a trigger.
+ * Resolves with the result, or undefined after an error or abort; never
+ * rejects. Errors go to onError, else console.error; aborts are not reported.
+ */
+export async function runForTrigger(
+  perform: () => Promise<ExportResult>,
+  onExported: ((result: ExportResult) => void) | undefined,
+  onError: ((error: unknown) => void) | undefined,
+): Promise<ExportResult | undefined> {
+  try {
+    const result = await perform();
+    onExported?.(result);
+    return result;
+  } catch (err) {
+    if (!isAbort(err)) {
+      if (onError) onError(err);
+      else console.error(err);
+    }
+    return undefined;
+  }
+}
+
+/** Internal (shared with <ExportTableButton>): the default button or the render prop. */
+export function renderTrigger(
+  children: ReactNode | ((api: ExcelExportRenderApi) => ReactNode) | undefined,
+  api: ExcelExportRenderApi,
+): ReactElement {
+  const content: ReactNode =
+    typeof children === 'function'
+      ? children(api)
+      : createElement(
+          'button',
+          { type: 'button', disabled: api.status === 'exporting', onClick: () => void api.run() },
+          children ?? 'Export',
+        );
+  return createElement(Fragment, null, content);
+}
+
 function isDev(): boolean {
   return typeof process !== 'undefined' && process.env?.['NODE_ENV'] !== 'production';
 }
@@ -46,37 +85,21 @@ export function ExcelExport(props: ExcelExportProps): ReactElement {
     console.error(`react-data-export: ${MISUSE}.`);
   }
 
-  const run = useCallback(async (): Promise<ExportResult | undefined> => {
+  const run = useCallback((): Promise<ExportResult | undefined> => {
     const { dataset, workbook, onExported, onError, children: _children, ...options } = latest.current;
-    try {
-      let result: ExportResult;
-      if (dataset !== undefined && workbook === undefined) {
-        const { columns, data, ...sheetOptions } = dataset;
-        result = await exportDataset({ columns, data }, { ...options, ...sheetOptions });
-      } else if (workbook !== undefined && dataset === undefined) {
-        result = await exportWorkbook(workbook, options);
-      } else {
+    return runForTrigger(
+      async () => {
+        if (dataset !== undefined && workbook === undefined) {
+          const { columns, data, ...sheetOptions } = dataset;
+          return exportDataset({ columns, data }, { ...options, ...sheetOptions });
+        }
+        if (workbook !== undefined && dataset === undefined) return exportWorkbook(workbook, options);
         throw new TypeError(`react-data-export: ${MISUSE}`);
-      }
-      onExported?.(result);
-      return result;
-    } catch (err) {
-      if (!isAbort(err)) {
-        if (onError) onError(err);
-        else console.error(err);
-      }
-      return undefined;
-    }
+      },
+      onExported,
+      onError,
+    );
   }, [exportDataset, exportWorkbook]);
 
-  const { children } = props;
-  const content: ReactNode =
-    typeof children === 'function'
-      ? children({ run, status, progress })
-      : createElement(
-          'button',
-          { type: 'button', disabled: status === 'exporting', onClick: () => void run() },
-          children ?? 'Export',
-        );
-  return createElement(Fragment, null, content);
+  return renderTrigger(props.children, { run, status, progress });
 }

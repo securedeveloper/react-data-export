@@ -35,7 +35,21 @@ interface State {
 
 const INITIAL: State = { status: 'idle', progress: null, error: undefined, result: null };
 
-export function useExcelExport(defaults?: ExportOptions): UseExcelExport {
+/** Internal: what a runner gives its hook. */
+export interface ExportRunner {
+  run(perform: (options: ExportOptions) => Promise<ExportResult>, options: ExportOptions | undefined): Promise<ExportResult>;
+  abort(reason?: unknown): void;
+  status: ExportStatus;
+  progress: Progress | null;
+  error: unknown;
+  result: ExportResult | null;
+}
+
+/**
+ * Internal: the state, abort and unmount handling shared by useExcelExport and
+ * useTableExport (docs/api.md §5, §13), so the two can't drift.
+ */
+export function useExportRunner(defaults?: ExportOptions): ExportRunner {
   const [state, setState] = useState<State>(INITIAL);
   const defaultsRef = useRef(defaults);
   defaultsRef.current = defaults;
@@ -109,6 +123,16 @@ export function useExcelExport(defaults?: ExportOptions): UseExcelExport {
     [],
   );
 
+  const abort = useCallback((reason?: unknown): void => {
+    for (const c of controllers.current) c.abort(reason);
+  }, []);
+
+  return { run, abort, ...state };
+}
+
+export function useExcelExport(defaults?: ExportOptions): UseExcelExport {
+  const { run, ...rest } = useExportRunner(defaults);
+
   const exportDataset = useCallback(
     <T>(dataset: Dataset<T>, options?: ExportOptions & DatasetOptions<T>): Promise<ExportResult> =>
       run((merged) => exportDatasetFn(dataset, { ...options, ...merged }), options),
@@ -121,9 +145,5 @@ export function useExcelExport(defaults?: ExportOptions): UseExcelExport {
     [run],
   );
 
-  const abort = useCallback((reason?: unknown): void => {
-    for (const c of controllers.current) c.abort(reason);
-  }, []);
-
-  return { exportDataset, exportWorkbook, abort, ...state };
+  return { exportDataset, exportWorkbook, ...rest };
 }
