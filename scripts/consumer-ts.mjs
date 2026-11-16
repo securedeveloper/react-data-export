@@ -9,7 +9,7 @@
 // `npm run build -w react-data-export` first. Exits 1 if any cell fails.
 //
 // Each cell runs `tsc --noEmit` with strict and skipLibCheck: false over:
-//   - a .tsx component that calls useVersion() and renders JSX (react-jsx)
+//   - a .tsx component using useExcelExport and <ExcelExport> (react-jsx), and exportDataset
 //   - a CommonJS .cts consumer (node16/nodenext only; bundler has no CJS mode)
 //   - @ts-expect-error probes that fail if the package's types resolve to `any`
 import { execFileSync } from 'node:child_process';
@@ -53,25 +53,62 @@ if (values.tarball) {
 }
 
 const tsx = `import type { ReactElement } from 'react';
-import { useVersion, version } from 'react-data-export';
+import { ExcelExport, exportDataset, isExcelError, sanitizeSheetName, useExcelExport, version } from 'react-data-export';
+import type { CellInput, CsvWriteOptions, Dataset, ExportResult, Style, WriteOptions } from 'react-data-export';
 
-export function Badge(): ReactElement {
-  const v: string = useVersion();
-  return <span title={version}>{v}</span>;
+interface Row { name: string; n: number }
+const ds: Dataset<Row> = {
+  columns: [{ title: 'Name', key: 'name' }, { title: 'Double', value: (r) => r.n * 2 }, false],
+  data: [{ name: 'a', n: 1 }],
+};
+
+export function Buttons(): ReactElement {
+  const hook = useExcelExport({ filename: 'x' });
+  return (
+    <div title={version}>
+      <ExcelExport dataset={{ ...ds, name: 'Rows', freezeHeader: true }} filename="rows" onExported={(r: ExportResult) => r.filename}>
+        Export
+      </ExcelExport>
+      <ExcelExport workbook={{ sheets: [ds, null] }} format="xlsx">
+        {({ run, status }) => <button onClick={() => void run()}>{status}</button>}
+      </ExcelExport>
+      <button onClick={() => void hook.exportDataset(ds, { format: 'csv' })}>{hook.status}</button>
+    </div>
+  );
 }
 
-// These must be errors; if the package's types were missing or \`any\`, tsc reports unused directives.
-// @ts-expect-error version is a string
-export const notNumber: number = version;
-// @ts-expect-error useVersion takes no arguments
-useVersion(1);
-`;
-const cts = `import { useVersion, version } from 'react-data-export';
+export const done: Promise<ExportResult> = exportDataset(ds, { format: 'csv', csv: { delimiter: ';' }, download: false });
 
-export const v: string = version;
-export const hook: () => string = useVersion;
+// javascript-excel types, re-exported through react-data-export.
+export const header: Style = { font: { bold: true }, fill: 'FFEEAA' };
+export const cell: CellInput = { value: 1, style: header };
+export const csv: CsvWriteOptions = { delimiter: ';', bom: true };
+export const write: WriteOptions = { compression: 'store' };
+export const name: string = sanitizeSheetName('Q1/Q2');
+export const known: boolean = isExcelError(new Error('x'));
+
+// These must be errors; if the package's types were missing or \`any\`, tsc reports unused directives.
+// @ts-expect-error 0.x key: javascript-excel's Font has size, not sz
+export const legacy: Style = { font: { sz: 12 } };
+// @ts-expect-error unknown format
+exportDataset(ds, { format: 'xls' });
+// @ts-expect-error the value accessor gets the row type
+export const wrong: Dataset<Row> = { columns: [{ title: 'x', value: (r) => r.missing }], data: [] };
 // @ts-expect-error version is a string
 export const notNumber: number = version;
+`;
+const cts = `import { exportWorkbook, sanitizeSheetName, version } from 'react-data-export';
+import type { ExportResult, Style, WorkbookSpec } from 'react-data-export';
+
+const spec: WorkbookSpec = { sheets: [{ name: 'A', columns: [{ title: 'A' }], data: [[1]] }, false] };
+export const p: Promise<ExportResult> = exportWorkbook(spec, { format: 'csv', download: false });
+export const s: Style = { font: { italic: true } };
+export const n: string = sanitizeSheetName('a');
+export const v: string = version;
+// @ts-expect-error not a Style
+export const bad: Style = { font: 1 };
+// @ts-expect-error sheets is required
+export const empty: WorkbookSpec = {};
 `;
 
 function compilerOptions(resolution) {

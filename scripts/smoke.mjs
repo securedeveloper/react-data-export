@@ -38,24 +38,38 @@ try {
   writeFileSync(join(app, 'package.json'), JSON.stringify({ name: 'smoke-app', private: true }));
   run('npm', ['install', '--no-audit', '--no-fund', '--loglevel=error', join(work, packed.filename), `react@${reactRange}`, `@types/react@${reactRange}`], app);
 
+  step('"use client" directive is the first statement of both builds');
+  for (const f of ['dist/index.js', 'dist/index.cjs']) {
+    const first = readFileSync(join(app, 'node_modules/react-data-export', f), 'utf8').split('\n', 1)[0].trim();
+    if (first !== '"use client";' && first !== "'use client';") throw new Error(`${f} starts with ${JSON.stringify(first)}, not "use client"`);
+  }
+  console.log('directive ok');
+
   step('ESM import');
   console.log(run('node', ['--input-type=module', '-e', `
-    import { version, useVersion } from 'react-data-export';
+    import { version, exportDataset, exportWorkbook, useExcelExport, ExcelExport, isExcelError, sanitizeSheetName } from 'react-data-export';
     if (version !== ${JSON.stringify(pkg.version)}) throw new Error('bad version ' + version);
-    if (typeof useVersion !== 'function') throw new Error('useVersion missing');
-    console.log('esm ok', version);
+    for (const f of [exportDataset, exportWorkbook, useExcelExport, ExcelExport]) if (typeof f !== 'function') throw new Error('missing export');
+    if (sanitizeSheetName('a/b') !== 'a_b' || isExcelError(new Error('x')) !== false) throw new Error('javascript-excel re-exports broken');
+    const r = await exportDataset({ columns: [{ title: 'A', key: 'a' }], data: [{ a: 1 }] }, { download: false });
+    if (r.filename !== 'export.xlsx' || !(r.blob.size > 0)) throw new Error('exportDataset produced no file');
+    console.log('esm ok', version, r.filename, r.blob.size + ' bytes');
   `], app).trim());
 
   step('CJS require');
   console.log(run('node', ['-e', `
-    const { version, useVersion } = require('react-data-export');
+    const { version, exportDataset, exportWorkbook, useExcelExport, ExcelExport, isExcelError, sanitizeSheetName } = require('react-data-export');
     if (version !== ${JSON.stringify(pkg.version)}) throw new Error('bad version ' + version);
-    if (typeof useVersion !== 'function') throw new Error('useVersion missing');
-    console.log('cjs ok', version);
+    for (const f of [exportDataset, exportWorkbook, useExcelExport, ExcelExport]) if (typeof f !== 'function') throw new Error('missing export');
+    if (sanitizeSheetName('a/b') !== 'a_b' || isExcelError(new Error('x')) !== false) throw new Error('javascript-excel re-exports broken');
+    exportWorkbook({ sheets: [{ columns: [{ title: 'A' }], data: [[1]] }] }, { format: 'csv', download: false }).then((r) => {
+      if (r.filename !== 'export.csv' || !(r.blob.size > 0)) throw new Error('exportWorkbook produced no file');
+      console.log('cjs ok', version, r.filename, r.blob.size + ' bytes');
+    }).catch((e) => { console.error(e); process.exit(1); });
   `], app).trim());
 
   step('types (node16 ESM + CJS, bundler)');
-  const src = `import { version, useVersion } from 'react-data-export';\nconst v: string = version;\nconst h: () => string = useVersion;\nexport { v, h };\n`;
+  const src = `import { version, exportDataset, type ExportResult } from 'react-data-export';\nconst v: string = version;\nconst p: Promise<ExportResult> = exportDataset({ data: [{ a: 1 }] }, { download: false });\nexport { v, p };\n`;
   writeFileSync(join(app, 'esm.mts'), src);
   writeFileSync(join(app, 'cjs.cts'), src);
   writeFileSync(join(app, 'bundler.ts'), src);
