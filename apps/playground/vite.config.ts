@@ -22,7 +22,7 @@ const config: UserConfig = defineConfig({
     },
   },
   preview: { headers },
-  test: { include: ['test/**/*.test.ts'] },
+  test: { include: ['test/**/*.test.{ts,tsx}'] },
 } as UserConfig);
 
 export default config;

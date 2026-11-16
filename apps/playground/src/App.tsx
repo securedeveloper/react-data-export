@@ -1,6 +1,7 @@
 import { useEffect, useId, useMemo, useRef, useState, type ReactElement } from "react";
 import { fromDataset, type Sheet } from "javascript-excel";
 import { fromTable } from "javascript-excel/dom";
+import { DemoTable } from "./demo-table";
 import { ExcelExport, ExportTableButton, isExcelError, useExcelExport, useTableExport, version, type ExcelWarning } from "react-data-export";
 import { DEFAULT_OPTIONS, exportOptions, parseDataset, sheetOptions, type EditorOptions } from "./options";
 import { previewOf, type Preview } from "./preview";
@@ -214,62 +215,10 @@ function TableTab(): ReactElement {
   return (
     <div className="table-tab">
       <p>
-        An ordinary HTML table, exported as it is rendered: <code>colspan</code>/<code>rowspan</code> become merges, <code>data-type</code> and <code>data-numfmt</code> give types and number formats, rows marked <code>data-export-ignore</code> are skipped, links are kept, and with <em>computed styles</em> the page's bold, colours and alignment come along.
+        An ordinary HTML table, exported as it is rendered: <code>colspan</code>/<code>rowspan</code> become merges, <code>data-type</code> and <code>data-numfmt</code> give types and number formats, rows marked <code>data-export-ignore</code> or <code>hidden</code> are skipped, links are kept, and with <em>computed styles</em> the page's bold, colours and alignment come along.
       </p>
       <div className="sheet-scroll" role="region" aria-label="The HTML table to export" tabIndex={0}>
-        <table ref={ref} className="demo">
-          <caption>Orders (the table on the page)</caption>
-          <thead>
-            <tr>
-              <th rowSpan={2}>Order</th>
-              <th rowSpan={2}>Customer</th>
-              <th colSpan={2}>Amount</th>
-            </tr>
-            <tr>
-              <th>Net</th>
-              <th>Shipped</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">1001</th>
-              <td>
-                <a href="https://example.com/customers/ada">Ada</a>
-              </td>
-              <td data-type="number" data-value="1250.5" data-numfmt="#,##0.00">
-                1,250.50
-              </td>
-              <td data-type="date" data-value="2024-01-15">
-                15 Jan 2024
-              </td>
-            </tr>
-            <tr data-export-ignore="">
-              <th scope="row">draft</th>
-              <td colSpan={3}>Not exported (data-export-ignore)</td>
-            </tr>
-            <tr>
-              <th scope="row">1002</th>
-              <td>Grace</td>
-              <td data-type="number" data-value="980" data-numfmt="#,##0.00">
-                980.00
-              </td>
-              <td data-type="date" data-value="2024-01-16">
-                16 Jan 2024
-              </td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr>
-              <th scope="row" colSpan={2}>
-                Total
-              </th>
-              <td data-type="number" data-value="2230.5" data-numfmt="#,##0.00">
-                2,230.50
-              </td>
-              <td />
-            </tr>
-          </tfoot>
-        </table>
+        <DemoTable tableRef={ref} />
       </div>
       <fieldset className="options">
         <legend>Export options</legend>
