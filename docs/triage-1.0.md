@@ -1,12 +1,12 @@
 # react-data-export 1.0: issue and pull request triage plan
 
-Status: **decided (2026-11-16). Afzal accepted every recommendation.** Revised after `react-data-export/legacy` (1.0.0-alpha.2): the footer gained one sentence, and the comments for #138, #141, #155, #160 and the thank-yous for #143, #171, #176 mention `/legacy`. **The revision awaits Afzal's re-approval.** The decisions:
+Status: **done (2026-11-16).** After react-data-export 1.0.0-alpha.2 was published, the comments below were posted exactly as written, by a script that reads them from this file. **8 pull requests and 64 issues were commented on and closed, and 4 issues were commented on and left open** (#76, #94, #134, #170). No labels were added. Before that: **decided (2026-11-16). Afzal accepted every recommendation.** Revised after `react-data-export/legacy` (1.0.0-alpha.2): the footer gained one sentence, and the comments for #138, #141, #155, #160 and the thank-yous for #143, #171, #176 mention `/legacy`. Afzal re-approved the revision (2026-11-16). The decisions:
 1. the comment texts below are approved as written;
 2. the "fixed" issues are closed when `1.0.0-alpha.1` is published, not at 1.0.0;
 3. the credit lines go into the 1.0.0-alpha.1 changelog (as a patch changeset in the release PR, #195);
 4. #76 and #94 stay open until Afzal's check in Excel.
 
-Nothing has been posted or closed yet: the comments go out once `1.0.0-alpha.1` is on npm, when the links (the prerelease, the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md)) resolve. No labels are added.
+The comments were posted after `1.0.0-alpha.2` was on npm, so every link resolves.
 
 Snapshot: 68 open issues and 8 open community pull requests, fetched 2026-11-16. Dispositions are checked against 1.0.0-alpha.1 (dataset and table export, [docs/api.md](api.md)) on javascript-excel 2.0.0-alpha.2.
 
