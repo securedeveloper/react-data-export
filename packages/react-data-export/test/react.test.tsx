@@ -147,17 +147,29 @@ describe('useExcelExport', () => {
     errors.mockRestore();
   });
 
-  it('StrictMode: an export started on mount survives the development remount (one download)', async () => {
+  // Under React 18/19 StrictMode, development mounts, unmounts and remounts:
+  // the first run must be aborted by the simulated unmount (xlsx and csv alike;
+  // csv has no await of its own), and only the remount's export downloads.
+  it.each([
+    ['exportDataset', 'xlsx'],
+    ['exportDataset', 'csv'],
+    ['exportWorkbook', 'csv'],
+  ] as const)('StrictMode: %s (%s) started on mount downloads exactly once', async (fn, format) => {
     const results: string[] = [];
     function AutoExport() {
-      const { exportDataset, status } = useExcelExport();
+      const hook = useExcelExport();
       useEffect(() => {
-        exportDataset(people, { filename: 'auto' }).then(
+        const run =
+          fn === 'exportDataset'
+            ? hook.exportDataset(people, { filename: 'auto', format })
+            : hook.exportWorkbook({ sheets: [people] }, { filename: 'auto', format });
+        run.then(
           (r) => results.push(r.filename),
           () => undefined, // StrictMode's simulated unmount aborts the first run
         );
-      }, [exportDataset]);
-      return <output data-testid="auto">{status}</output>;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, []);
+      return <output data-testid="auto">{hook.status}</output>;
     }
     render(
       <StrictMode>
@@ -165,7 +177,7 @@ describe('useExcelExport', () => {
       </StrictMode>,
     );
     await waitFor(() => expect(screen.getByTestId('auto').textContent).toBe('done'));
-    expect(results).toEqual(['auto.xlsx']);
+    expect(results).toEqual([`auto.${format}`]);
     expect(downloadMock).toHaveBeenCalledTimes(1);
   });
 
