@@ -1,6 +1,12 @@
 # react-data-export 1.0: issue and pull request triage plan
 
-Status: **draft plan (RDE-1.13 prep). Nothing in this file has been posted, closed or labelled.** Every comment below is a draft for Afzal to approve; they are posted after `1.0.0-alpha.1` is on npm, when the links (the prerelease, the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md)) resolve.
+Status: **decided (2026-11-16). Afzal accepted every recommendation:**
+1. the comment texts below are approved as written;
+2. the "fixed" issues are closed when `1.0.0-alpha.1` is published, not at 1.0.0;
+3. the credit lines go into the 1.0.0-alpha.1 changelog (as a patch changeset in the release PR, #195);
+4. #76 and #94 stay open until Afzal's check in Excel.
+
+Nothing has been posted or closed yet: the comments go out once `1.0.0-alpha.1` is on npm, when the links (the prerelease, the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md)) resolve. No labels are added.
 
 Snapshot: 68 open issues and 8 open community pull requests, fetched 2026-11-16. Dispositions are checked against 1.0.0-alpha.1 (dataset and table export, [docs/api.md](api.md)) on javascript-excel 2.0.0-alpha.2.
 
@@ -67,7 +73,7 @@ Every comment ends with the same footer:
 
 ### CHANGELOG credit lines
 
-Proposed for the 1.0.0-alpha.1 changelog. Changesets has no free-form section, so the simplest place is one extra changeset in the release PR (re-cut), which Changesets lists under the release:
+In the 1.0.0-alpha.1 changelog: added as one patch changeset (`.changeset/community-credits.md`) in the release PR #195, which Changesets lists under the release:
 
 ```md
 Thanks to the community pull requests whose ideas shaped 1.0:
