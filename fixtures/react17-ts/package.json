@@ -1,0 +1,8 @@
+{
+  "name": "fixture-react17-ts",
+  "private": true,
+  "type": "module",
+  "scripts": { "typecheck": "tsc -p tsconfig.json", "build": "tsc -p tsconfig.json && vite build" },
+  "dependencies": { "react": "17.0.2", "react-dom": "17.0.2" },
+  "devDependencies": { "@types/react": "17.0.93", "@types/react-dom": "17.0.26", "typescript": "5.9.3", "vite": "8.3.8" }
+}
