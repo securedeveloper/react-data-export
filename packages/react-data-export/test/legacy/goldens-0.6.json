@@ -1,0 +1,475 @@
+{
+  "generatedFrom": "react-data-export@0.6.0",
+  "goldens": {
+    "columns-basic": {
+      "fileName": "Download.xlsx",
+      "fileExtension": "xlsx",
+      "sheets": [
+        {
+          "name": "People",
+          "ref": "A1:H3",
+          "cols": null,
+          "cells": {
+            "A1": {
+              "t": "s",
+              "v": "Name"
+            },
+            "B1": {
+              "t": "s",
+              "v": "Age"
+            },
+            "C1": {
+              "t": "s",
+              "v": "Joined"
+            },
+            "D1": {
+              "t": "s",
+              "v": "Active"
+            },
+            "E1": {
+              "t": "s",
+              "v": "Note"
+            },
+            "F1": {
+              "t": "s",
+              "v": "Score"
+            },
+            "G1": {
+              "t": "s",
+              "v": "Code"
+            },
+            "H1": {
+              "t": "s",
+              "v": "Empty"
+            },
+            "A2": {
+              "t": "s",
+              "v": "Ada"
+            },
+            "B2": {
+              "t": "n",
+              "v": 36
+            },
+            "C2": {
+              "t": "n",
+              "v": 45306,
+              "z": "m/d/yy"
+            },
+            "D2": {
+              "t": "b",
+              "v": true
+            },
+            "E2": {
+              "t": "s",
+              "v": ""
+            },
+            "F2": {
+              "t": "s",
+              "v": ""
+            },
+            "G2": {
+              "t": "s",
+              "v": "007"
+            },
+            "A3": {
+              "t": "s",
+              "v": "Alan"
+            },
+            "B3": {
+              "t": "n",
+              "v": 41
+            },
+            "C3": {
+              "t": "n",
+              "v": 45414.520833333336,
+              "z": "m/d/yy"
+            },
+            "D3": {
+              "t": "b",
+              "v": false
+            },
+            "E3": {
+              "t": "s",
+              "v": "x"
+            },
+            "F3": {
+              "t": "n",
+              "v": 0
+            },
+            "G3": {
+              "t": "s",
+              "v": "12"
+            }
+          }
+        }
+      ]
+    },
+    "columns-functions": {
+      "fileName": "report.xlsx.xlsx",
+      "fileExtension": "xlsx",
+      "sheets": [
+        {
+          "name": "Computed",
+          "ref": "A1:B3",
+          "cols": null,
+          "cells": {
+            "A1": {
+              "t": "s",
+              "v": "Upper"
+            },
+            "B1": {
+              "t": "s",
+              "v": "Double"
+            },
+            "A2": {
+              "t": "s",
+              "v": "ADA"
+            },
+            "B2": {
+              "t": "n",
+              "v": 72
+            },
+            "A3": {
+              "t": "s",
+              "v": "ALAN"
+            },
+            "B3": {
+              "t": "n",
+              "v": 82
+            }
+          }
+        }
+      ]
+    },
+    "dataset-styles": {
+      "fileName": "styled.xlsx",
+      "fileExtension": "xlsx",
+      "sheets": [
+        {
+          "name": "Styled",
+          "ref": "A1:D6",
+          "cols": [
+            {
+              "wpx": 80
+            },
+            {
+              "wch": 12
+            },
+            {
+              "wpx": 120
+            },
+            {
+              "wpx": 80
+            }
+          ],
+          "cells": {
+            "A1": {
+              "t": "s",
+              "v": "Item",
+              "s": {
+                "font": {
+                  "bold": true
+                }
+              }
+            },
+            "B1": {
+              "t": "s",
+              "v": "Qty",
+              "s": {
+                "font": {
+                  "bold": true
+                }
+              }
+            },
+            "C1": {
+              "t": "s",
+              "v": "Price",
+              "s": {
+                "font": {
+                  "color": {
+                    "rgb": "FFFF0000"
+                  }
+                },
+                "fill": {
+                  "patternType": "solid",
+                  "fgColor": {
+                    "rgb": "FFFFFF00"
+                  }
+                }
+              }
+            },
+            "D1": {
+              "t": "s",
+              "v": "When",
+              "s": {
+                "font": {
+                  "bold": true
+                }
+              }
+            },
+            "A2": {
+              "t": "s",
+              "v": "Pens",
+              "s": {
+                "font": {
+                  "sz": "14",
+                  "bold": true,
+                  "name": "Arial"
+                }
+              }
+            },
+            "B2": {
+              "t": "n",
+              "v": 10
+            },
+            "C2": {
+              "t": "n",
+              "v": 1.5,
+              "s": {
+                "numFmt": "0.00"
+              }
+            },
+            "D2": {
+              "t": "n",
+              "v": 45306,
+              "z": "m/d/yy"
+            },
+            "A3": {
+              "t": "s",
+              "v": "Paper"
+            },
+            "B3": {
+              "t": "n",
+              "v": 3,
+              "s": {
+                "fill": {
+                  "patternType": "solid",
+                  "fgColor": {
+                    "rgb": "FF00FF00"
+                  }
+                },
+                "alignment": {
+                  "horizontal": "right"
+                }
+              }
+            },
+            "D3": {
+              "t": "n",
+              "v": 45657.75,
+              "z": "m/d/yy"
+            },
+            "A4": {
+              "t": "b",
+              "v": true,
+              "s": {
+                "border": {
+                  "top": {
+                    "style": "thin",
+                    "color": {
+                      "rgb": "FF000000"
+                    }
+                  }
+                }
+              }
+            },
+            "B4": {
+              "t": "n",
+              "v": 0
+            },
+            "C4": {
+              "t": "n",
+              "v": -2.25
+            }
+          }
+        }
+      ]
+    },
+    "dataset-blocks": {
+      "fileName": "blocks.xlsx",
+      "fileExtension": "xlsx",
+      "sheets": [
+        {
+          "name": "Blocks",
+          "ref": "A2:C12",
+          "cols": [
+            {
+              "wch": 30
+            }
+          ],
+          "cells": {
+            "A2": {
+              "t": "s",
+              "v": "A",
+              "s": {
+                "font": {
+                  "bold": true
+                }
+              }
+            },
+            "B2": {
+              "t": "s",
+              "v": "B",
+              "s": {
+                "font": {
+                  "bold": true
+                }
+              }
+            },
+            "A3": {
+              "t": "n",
+              "v": 1
+            },
+            "B3": {
+              "t": "n",
+              "v": 2
+            },
+            "A4": {
+              "t": "n",
+              "v": 3
+            },
+            "B4": {
+              "t": "n",
+              "v": 4
+            },
+            "B7": {
+              "t": "s",
+              "v": null,
+              "s": {
+                "font": {
+                  "bold": true
+                }
+              }
+            },
+            "C7": {
+              "t": "s",
+              "v": null,
+              "s": {
+                "font": {
+                  "bold": true
+                }
+              }
+            },
+            "B8": {
+              "t": "s",
+              "v": "Johnson"
+            },
+            "C8": {
+              "t": "s",
+              "v": "Finance"
+            },
+            "C9": {
+              "t": "s",
+              "v": "Last",
+              "s": {
+                "font": {
+                  "bold": true
+                }
+              }
+            },
+            "C10": {
+              "t": "s",
+              "v": "z"
+            },
+            "A12": {
+              "t": "s",
+              "v": "no header"
+            },
+            "B12": {
+              "t": "n",
+              "v": 5
+            }
+          }
+        }
+      ]
+    },
+    "sheets-mixed": {
+      "fileName": "book.xlsx",
+      "fileExtension": "xlsx",
+      "sheets": [
+        {
+          "name": "First",
+          "ref": "A1:A3",
+          "cols": null,
+          "cells": {
+            "A1": {
+              "t": "s",
+              "v": "Name"
+            },
+            "A2": {
+              "t": "s",
+              "v": "Ada"
+            },
+            "A3": {
+              "t": "s",
+              "v": "Alan"
+            }
+          }
+        },
+        {
+          "name": "Second",
+          "ref": "A1:A4",
+          "cols": [
+            {
+              "wpx": 80
+            }
+          ],
+          "cells": {
+            "A1": {
+              "t": "s",
+              "v": "X",
+              "s": {
+                "font": {
+                  "bold": true
+                }
+              }
+            },
+            "A2": {
+              "t": "n",
+              "v": 1
+            },
+            "A3": {
+              "t": "n",
+              "v": 2
+            }
+          }
+        },
+        {
+          "name": "Third",
+          "ref": "A1:A2",
+          "cols": null,
+          "cells": {
+            "A1": {
+              "t": "s",
+              "v": "V"
+            },
+            "A2": {
+              "t": "s",
+              "v": "fallback"
+            }
+          }
+        }
+      ]
+    },
+    "filename-from-name": {
+      "fileName": "data.xlsx.xlsx",
+      "fileExtension": "xlsx",
+      "sheets": [
+        {
+          "name": "S",
+          "ref": "A1:A2",
+          "cols": null,
+          "cells": {
+            "A1": {
+              "t": "s",
+              "v": "A"
+            },
+            "A2": {
+              "t": "n",
+              "v": 1
+            }
+          }
+        }
+      ]
+    }
+  }
+}

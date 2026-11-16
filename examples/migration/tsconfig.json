@@ -3,10 +3,20 @@
   "compilerOptions": {
     "declaration": false,
     "isolatedDeclarations": false,
-    "types": ["node"],
+    "types": [
+      "node"
+    ],
     "paths": {
-      "react-data-export": ["../../packages/react-data-export/src/index.ts"]
+      "react-data-export": [
+        "../../packages/react-data-export/src/index.ts"
+      ],
+      "react-data-export/legacy": [
+        "../../packages/react-data-export/src/legacy.ts"
+      ]
     }
   },
-  "include": ["*.ts", "*.tsx"]
+  "include": [
+    "*.ts",
+    "*.tsx"
+  ]
 }

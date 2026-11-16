@@ -1,6 +1,6 @@
 # Migrating from 0.6 to 1.0
 
-react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0, and a clean break: the 0.x components `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` are gone. This guide shows every 0.x pattern next to its 1.0 code, then lists the behaviour that changed on purpose.
+react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0, and a clean break: the 0.x components `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` are not in the 1.0 API. This guide shows every 0.x pattern next to its 1.0 code, then lists the behaviour that changed on purpose. If you need 0.x code to run on 1.0 first, there is a [quick path](#11-quick-path-react-data-exportlegacy): a deprecated `react-data-export/legacy` entry with the old components.
 
 **You don't have to move now.** 0.6.x stays on npm unchanged: `npm install react-data-export@0.6` keeps working, and nothing is unpublished or deprecated. Its docs are at the [`v0.6.0` tag](https://github.com/securedeveloper/react-data-export/tree/v0.6.0).
 
@@ -9,6 +9,7 @@ Every 1.0 snippet below is a file in [`examples/migration/`](../examples/migrati
 ## Contents
 
 1. [Install and imports](#1-install-and-imports)
+   - [1.1 Quick path: `react-data-export/legacy`](#11-quick-path-react-data-exportlegacy)
 2. [Quick reference](#2-quick-reference)
 3. [Side by side](#3-side-by-side)
    - [3.1 `ExcelFile` + `ExcelSheet` + `ExcelColumn`](#31-excelfile--excelsheet--excelcolumn)
@@ -26,7 +27,7 @@ Every 1.0 snippet below is a file in [`examples/migration/`](../examples/migrati
 
 ```sh
 npm uninstall file-saver tempa-xlsx    # only if you added them for 0.x
-npm install react-data-export@next     # 1.0 prereleases go to the `next` tag; none is out yet
+npm install react-data-export@next     # 1.0 prereleases are on the `next` tag
 ```
 
 - **No peer libraries, no bundler setup.** 0.x needed `file-saver` and `tempa-xlsx`, and webpack settings for them (`node: { fs: 'empty' }`, `externals` for `./cptable` and `./jszip`). Delete those. 1.0's only dependency is javascript-excel, which has no dependencies of its own.
@@ -38,6 +39,54 @@ npm install react-data-export@next     # 1.0 prereleases go to the `next` tag; n
   ```
 - **Types ship with the package**, generated from the source, so they match the code. The hand-written 0.x `types/index.d.ts` is gone.
 - React 17, 18 and 19 are supported. Importing the package is safe during server rendering, and the entry is marked `"use client"`.
+
+### 1.1 Quick path: `react-data-export/legacy`
+
+To get 0.x code running on 1.0 before you rewrite it, change the import to `react-data-export/legacy`. That's a separate, **deprecated** entry with `<ExcelFile>`, `<ExcelSheet>`, `<ExcelColumn>`, the 0.x default export and the `dataSet` shape with xlsx-style styles, built on 1.0's export code and javascript-excel. It is supported for all of 1.x and removed in 2.0. In development it logs one warning that points here.
+
+<!-- example: examples/migration/legacy-quick-path.tsx -->
+```tsx
+// 0.x code on 1.0 with one import change. Deprecated: supported for all of 1.x, removed in 2.0.
+import ReactExport from 'react-data-export/legacy';
+
+const ExcelFile = ReactExport.ExcelFile;
+const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
+const ExcelColumn = ReactExport.ExcelFile.ExcelColumn;
+
+interface Employee {
+  name: string;
+  is_married: boolean;
+}
+
+export function Download({ employees }: { employees: Employee[] }) {
+  return (
+    <ExcelFile filename="employees" element={<button>Download</button>}>
+      <ExcelSheet data={employees} name="Employees">
+        <ExcelColumn label="Name" value="name" />
+        <ExcelColumn label="Marital Status" value={(col: Employee) => (col.is_married ? 'Married' : 'Single')} />
+      </ExcelSheet>
+    </ExcelFile>
+  );
+}
+```
+
+The files it writes match 0.6.0's output. The tests compare it, cell by cell, with what the real 0.6.0 built. That covers:
+- plain `<ExcelColumn>` headers and bold `dataSet` headers (a column's `style` replaces the bold)
+- `{ wpx: 80 }` for `dataSet` object columns without a width, applied from column A with the last block's widths, as 0.6 did
+- `xSteps`/`ySteps` placement
+- dates converted as UTC with the short-date format
+- empty values (`undefined` and `NaN` → an empty text cell, `null` → no cell)
+- the default file name `Download`, with the extension always appended (`report.xlsx` → `report.xlsx.xlsx`)
+- `<span>` around `element`, and the default `<button>Download</button>`
+
+What it does **not** reproduce, on purpose:
+- **One download under StrictMode:** `hideElement` downloads after mount, not in the constructor.
+- **`fileExtension: 'csv'`** writes real CSV (UTF-8 BOM, CRLF, formula-injection guard). With several sheets, it writes the first one and warns.
+- **`'xls'`, `'txt'` and `'html'`** write an xlsx file with an `.xlsx` name and a development warning. 0.x wrote xlsx bytes under the other extension.
+- **String `dataSet` columns** (`columns: ['Name', 'Dept']`) keep their header text. 0.6.0 left those headers empty, a regression in its last release.
+- **Conditional children:** falsy `<ExcelSheet>` and `<ExcelColumn>` children are skipped, and an invalid sheet name is sanitized with a warning instead of producing a broken file.
+
+`convertLegacyStyle` ([3.7](#37-cell-styles)) is exported from the same entry. The legacy code is a separate entry, so it isn't in your bundle unless you import it.
 
 ## 2. Quick reference
 
@@ -488,116 +537,22 @@ export async function asTabSeparatedTxt(): Promise<void> {
 
 Invalid styles now fail loudly, with some exceptions. A 0.x fill (`patternType` but no `pattern`), a string theme index, `auto: 1`, a boolean `vertAlign` or `horizontal: 'bottom'` throws `INVALID_STYLE`, naming the cell. But keys that 1.0 doesn't know, such as `font.sz` and `alignment.textRotation`, are ignored without an error. Convert them; don't rely on an error to find them.
 
-If your app has many 0.x style objects, convert them in one place. This helper is type-checked with the rest of the examples. Copy it into your project:
+If your app has many 0.x style objects, convert them in one place with `convertLegacyStyle` from `react-data-export/legacy`. It's the same entry as the [quick path](#11-quick-path-react-data-exportlegacy), and only this function ends up in your bundle:
 
 <!-- example: examples/migration/legacy-style.ts -->
 ```ts
 import type { Style } from 'react-data-export';
+import { convertLegacyStyle, type LegacyStyle } from 'react-data-export/legacy';
 
-/** A 0.x (xlsx-style) style object, as documented in the 0.6 README. */
-export interface LegacyColor {
-  auto?: number;
-  rgb?: string;
-  theme?: string | number;
-  tint?: string | number;
-  indexed?: number;
-}
-export interface LegacyBorderSide {
-  style: string;
-  color?: LegacyColor;
-}
-export interface LegacyStyle {
-  fill?: { patternType?: string; fgColor?: LegacyColor; bgColor?: LegacyColor };
-  font?: {
-    name?: string;
-    sz?: string | number;
-    color?: LegacyColor;
-    bold?: boolean;
-    underline?: boolean;
-    italic?: boolean;
-    strike?: boolean;
-    outline?: boolean;
-    shadow?: boolean;
-  };
-  numFmt?: string;
-  alignment?: { vertical?: string; horizontal?: string; wrapText?: boolean; readingOrder?: number; textRotation?: number };
-  border?: { top?: LegacyBorderSide; bottom?: LegacyBorderSide; left?: LegacyBorderSide; right?: LegacyBorderSide; diagonal?: LegacyBorderSide; diagonalUp?: boolean; diagonalDown?: boolean };
-}
+// A 0.x (xlsx-style) style object, as documented in the 0.6 README.
+const header: LegacyStyle = {
+  font: { sz: '14', bold: true, color: { rgb: 'FFFF0000' } },
+  fill: { patternType: 'solid', fgColor: { rgb: 'FFFFFF00' } },
+  alignment: { horizontal: 'center', textRotation: 135 },
+};
 
-type Font = NonNullable<Style['font']>;
-type Color = NonNullable<Font['color']>;
-type Alignment = NonNullable<Style['alignment']>;
-type Border = NonNullable<Style['border']>;
-type BorderSide = NonNullable<Border['top']>;
-
-function color(c: LegacyColor | undefined): Color | undefined {
-  if (!c) return undefined;
-  if (c.rgb !== undefined) return { rgb: c.rgb };
-  if (c.theme !== undefined) return { theme: Number(c.theme), ...(c.tint !== undefined ? { tint: Number(c.tint) } : {}) };
-  if (c.indexed !== undefined) return { indexed: c.indexed };
-  if (c.auto) return { auto: true };
-  return undefined;
-}
-
-// 0.x: 0–90 up, 91–180 down (135 = 45° down), 255 = stacked. 1.0: -90..90, or 'vertical'.
-function rotation(r: number | undefined): Alignment['rotation'] {
-  if (r === undefined) return undefined;
-  if (r === 255) return 'vertical';
-  return r > 90 ? 90 - r : r;
-}
-
-const HORIZONTAL = ['general', 'left', 'center', 'right', 'fill', 'justify', 'centerContinuous', 'distributed'] as const;
-const VERTICAL = ['top', 'center', 'bottom', 'justify', 'distributed'] as const;
-const pick = <T extends string>(allowed: readonly T[], v: string | undefined): T | undefined =>
-  allowed.find((a) => a === v);
-
-function side(s: LegacyBorderSide | undefined): BorderSide | undefined {
-  if (!s) return undefined;
-  const c = color(s.color);
-  return { style: s.style as BorderSide['style'], ...(c ? { color: c } : {}) };
-}
-
-/** Converts a 0.x cell style to a react-data-export 1.0 (javascript-excel) style. */
-export function convertLegacyStyle(old: LegacyStyle): Style {
-  const style: Style = {};
-  if (old.font) {
-    const { sz, color: c, name, bold, italic, underline, strike, outline, shadow } = old.font;
-    const font: Font = { name, bold, italic, underline, strike, outline, shadow };
-    if (sz !== undefined) font.size = Number(sz);
-    if (c) font.color = color(c);
-    style.font = font;
-  }
-  // A fill with a colour becomes a solid fill; 'none' or no colour means no fill.
-  if (old.fill && old.fill.patternType !== 'none' && old.fill.fgColor) {
-    const fg = color(old.fill.fgColor);
-    const bg = color(old.fill.bgColor);
-    style.fill = { pattern: 'solid', ...(fg ? { fgColor: fg } : {}), ...(bg ? { bgColor: bg } : {}) };
-  }
-  if (old.numFmt !== undefined) style.numFmt = old.numFmt;
-  if (old.alignment) {
-    const a = old.alignment;
-    style.alignment = {
-      horizontal: pick(HORIZONTAL, a.horizontal),
-      vertical: pick(VERTICAL, a.vertical),
-      wrapText: a.wrapText,
-      rotation: rotation(a.textRotation),
-      readingOrder: a.readingOrder === 2 ? 'rtl' : a.readingOrder === 1 ? 'ltr' : undefined,
-    };
-  }
-  if (old.border) {
-    const b = old.border;
-    style.border = {
-      top: side(b.top),
-      bottom: side(b.bottom),
-      left: side(b.left),
-      right: side(b.right),
-      diagonal: side(b.diagonal),
-      diagonalUp: b.diagonalUp,
-      diagonalDown: b.diagonalDown,
-    };
-  }
-  return style;
-}
+// { font: { size: 14, bold: true, color: { rgb: 'FFFF0000' } }, fill: { pattern: 'solid', … }, alignment: { horizontal: 'center', rotation: -45 } }
+export const headerStyle: Style = convertLegacyStyle(header);
 ```
 
 ```ts
@@ -716,9 +671,9 @@ export async function exportLike0x(rows: Row[]): Promise<void> {
 ## 5. Not carried over
 
 - **`.xls`, `.html` and `.txt` output**, and `fileExtension` itself. See the table in [3.6](#36-fileextension-and-filename).
-- **`element` cloning.** Injecting `onClick` into an arbitrary element breaks with components that don't forward it, and with fragments. The render prop replaces it ([api.md §12 Q5](api.md#12-design-decisions)).
-- **A `hideElement` prop.** It is a three-line effect instead ([3.4](#34-hideelement)).
+- **`element` cloning** (kept only in [`react-data-export/legacy`](#11-quick-path-react-data-exportlegacy), as 0.6's `<span>` wrapper). Injecting `onClick` into an arbitrary element breaks with components that don't forward it, and with fragments. The render prop replaces it ([api.md §12 Q5](api.md#12-design-decisions)).
+- **A `hideElement` prop** in the 1.0 API. It is a three-line effect instead ([3.4](#34-hideelement)); `react-data-export/legacy` keeps the prop.
 - **`data` as a function** on a sheet. Pass the rows, or build them in your own handler.
-- **The default export and `ExcelFile.ExcelSheet` / `ExcelFile.ExcelColumn`**, and PropTypes. 1.0 has named exports and TypeScript types.
+- **The default export and `ExcelFile.ExcelSheet` / `ExcelFile.ExcelColumn`** in the 1.0 API, and PropTypes. 1.0 has named exports and TypeScript types; `react-data-export/legacy` keeps the 0.x default export (deprecated).
 
 Found a 0.x pattern this guide doesn't cover? Please open an issue with the snippet.

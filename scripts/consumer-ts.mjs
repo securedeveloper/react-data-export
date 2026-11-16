@@ -55,6 +55,7 @@ if (values.tarball) {
 const tsx = `import { useRef, type ReactElement } from 'react';
 import { ExcelExport, ExportTableButton, exportDataset, exportTable, isExcelError, sanitizeSheetName, useExcelExport, useTableExport, version } from 'react-data-export';
 import type { FromTableOptions, TableRef } from 'react-data-export';
+import ReactExport, { ExcelColumn, ExcelSheet, convertLegacyStyle, type ExcelSheetData, type LegacyStyle } from 'react-data-export/legacy';
 import type { CellInput, CsvWriteOptions, Dataset, ExportResult, Style, WriteOptions } from 'react-data-export';
 
 interface Row { name: string; n: number }
@@ -118,10 +119,32 @@ export const wrong: Dataset<Row> = { columns: [{ title: 'x', value: (r) => r.mis
 export const notNumber: number = version;
 // @ts-expect-error not a fromTable option value
 export const badHeader: FromTableOptions = { header: 'tbody' };
+// The 0.x API through react-data-export/legacy (deprecated, supported in 1.x).
+const { ExcelFile } = ReactExport;
+const legacySheet: ExcelSheetData = { xSteps: 1, ySteps: 2, columns: ['Name', { title: 'Age', width: { wpx: 80 } }], data: [['Ada', 36], [{ value: 'x', style: { font: { sz: '12' } } }, null]] };
+export function Legacy(): ReactElement {
+  return (
+    <ExcelFile filename="Download" fileExtension="csv" element={<button>Download</button>}>
+      <ExcelSheet data={[{ name: 'Ada' }]} name="People">
+        <ExcelColumn label="Name" value="name" />
+        <ExcelColumn label="Upper" value={(r: { name: string }) => r.name.toUpperCase()} />
+      </ExcelSheet>
+      <ExcelFile.ExcelSheet dataSet={[legacySheet]} name="Blocks" />
+    </ExcelFile>
+  );
+}
+export const legacyStyle: LegacyStyle = { fill: { patternType: 'solid', fgColor: { rgb: 'FFFF0000' } } };
+export const converted: Style = convertLegacyStyle(legacyStyle);
+// @ts-expect-error ExcelColumn needs a label
+export const noLabel: ReactElement = <ExcelColumn value="name" />;
 // @ts-expect-error tableRef is required
 export const noRef: ReactElement = <ExportTableButton filename="x" />;
 `;
 const cts = `import { exportWorkbook, sanitizeSheetName, version } from 'react-data-export';
+import ReactExport, { convertLegacyStyle, type ExcelSheetData } from 'react-data-export/legacy';
+export const legacyFile: unknown = ReactExport.ExcelFile.ExcelSheet;
+export const blocks: ExcelSheetData[] = [{ columns: [{ title: 'A' }], data: [[1]] }];
+export const size: number | undefined = convertLegacyStyle({ font: { sz: 12 } }).font?.size;
 import type { ExportResult, Style, WorkbookSpec } from 'react-data-export';
 
 const spec: WorkbookSpec = { sheets: [{ name: 'A', columns: [{ title: 'A' }], data: [[1]] }, false] };
