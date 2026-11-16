@@ -347,8 +347,7 @@ export function AutoDownload({ rows }: { rows: Row[] }) {
 }
 ```
 
-- 0.x started the download in the `ExcelFile` constructor, so it ran on every construction. In development, React's StrictMode constructs class components twice, which gave two files. 1.0 starts it in an effect, and the hook aborts it when the component unmounts. StrictMode's simulated unmount aborts the first run and the remount starts a new one, so an xlsx export saves one file.
-  - **CSV caveat:** a CSV export finishes synchronously inside the first call, before the simulated unmount can abort it. Until that is fixed, this recipe saves the CSV twice under StrictMode in development. Production builds, which run effects once, are not affected.
+- 0.x started the download in the `ExcelFile` constructor, so it ran on every construction. In development, React's StrictMode constructs class components twice, which gave two files. 1.0 starts it in an effect, and the hook aborts it when the component unmounts. StrictMode's simulated unmount aborts the first run and the remount starts a new one, so there is one download under StrictMode, for xlsx and CSV.
 - Browsers may block a download that doesn't follow a click or a key press. That was true in 0.x too. Prefer a button where you can.
 - The hook also gives `status`, `progress`, `error`, `result` and `abort()`. See [api.md §5](api.md#5-useexcelexport).
 
@@ -673,7 +672,7 @@ Intentional changes, found by comparing the 0.6.0 source with 1.0. Where you mig
 | **Column widths** | `dataSet` columns written as objects: `{ wpx: 80 }` unless set. `<ExcelColumn>`: none. Several blocks on one sheet: the last block's widths won | no width unless set, so Excel's default (about 64 px) applies | `width: { wpx: 80 }` on each column |
 | **Dates** | converted as UTC: midnight local time in Berlin became 23:00 UTC the day before, so a date-only format showed the previous day | the local time zone of the browser (javascript-excel's default) | `write: { dateZone: 'utc' }` |
 | **Date format** | built-in format 14 (short date) | the same, unless the column or cell sets `numFmt` | — |
-| **`hideElement` / auto-download** | downloads in the constructor: twice under StrictMode in development | xlsx: once under StrictMode (CSV: see [3.4](#34-hideelement)); aborted on unmount | — |
+| **`hideElement` / auto-download** | downloads in the constructor: twice under StrictMode in development | one download under StrictMode, xlsx and CSV; aborted on unmount | — |
 | **`fileExtension` other than xlsx** | an xlsx package under that name ([3.6](#36-fileextension-and-filename)) | real CSV for `'csv'`; any other format is a `TypeError` | — |
 | **File name** | extension always appended; default `Download` | appended unless already there; default `export` | `filename: 'Download'` |
 | **Trigger markup** | `<span onClick>` around `element`; default `<button>Download</button>` | no wrapper; default `<button type="button">Export</button>`, disabled while exporting | `<ExcelExport …>Download</ExcelExport>` |
