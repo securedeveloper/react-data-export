@@ -176,3 +176,20 @@ jobs:
             DIST_TAG=next
           fi
           npm publish "./$PACKAGE_DIR" --dry-run --tag "$DIST_TAG"
+
+  # The packed tarball in real bundlers with no Node polyfill config
+  # (fixtures/, scripts/bundlers.mjs): Vite + React 19, Next.js 16 App
+  # Router (webpack and Turbopack, server prerender), Create React App 5
+  # (webpack 5), React 17 + TypeScript. Not a required check.
+  bundlers:
+    name: Bundlers
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Build every fixture against the packed tarball
+        run: npm run bundlers

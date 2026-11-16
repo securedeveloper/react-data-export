@@ -1,0 +1,9 @@
+{
+  "name": "fixture-next-app",
+  "private": true,
+  "scripts": {
+    "build": "next build --webpack",
+    "build:turbopack": "next build --turbopack"
+  },
+  "dependencies": { "next": "16.4.6", "react": "19.3.1", "react-dom": "19.3.1" }
+}
