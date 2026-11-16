@@ -1,0 +1,212 @@
+/* Tokens. Text/background pairs are at least 4.5:1 (WCAG AA) in both schemes. */
+:root {
+  color-scheme: light;
+  --bg: #ffffff;
+  --fg: #1a1a1a;
+  --muted: #555555;
+  --border: #8a8a8a;
+  --surface: #f4f5f7;
+  --accent: #0b5cad;
+  --accent-fg: #ffffff;
+  --error: #b00020;
+  --banner-bg: #fff4ce;
+  --banner-fg: #3d2e00;
+  --focus: #0b5cad;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.5;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #161719;
+    --fg: #eceef0;
+    --muted: #b4b8bd;
+    --border: #7d838a;
+    --surface: #23252a;
+    --accent: #7ab7ff;
+    --accent-fg: #0b1a2b;
+    --error: #ff8a95;
+    --banner-bg: #3a3000;
+    --banner-fg: #ffe9a3;
+    --focus: #7ab7ff;
+  }
+}
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+}
+a { color: var(--accent); }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.banner {
+  background: var(--banner-bg);
+  color: var(--banner-fg);
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.95rem;
+}
+main, footer {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+header h1 { margin: 1.25rem 0 0.25rem; font-size: 1.6rem; }
+.lead { margin: 0 0 1rem; color: var(--muted); }
+footer { padding-block: 2rem; color: var(--muted); font-size: 0.9rem; }
+.tablist {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 2px solid var(--border);
+  overflow-x: auto;
+}
+.tablist [role="tab"] {
+  font: inherit;
+  padding: 0.6rem 1.1rem;
+  min-height: 44px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  background: transparent;
+  color: var(--fg);
+  cursor: pointer;
+}
+.tablist [role="tab"][aria-selected="true"] {
+  background: var(--accent);
+  color: var(--accent-fg);
+  font-weight: 600;
+}
+.panel { padding: 1rem 0; }
+.panel:focus-visible { outline-offset: -3px; }
+h2 { font-size: 1.25rem; margin: 0.5rem 0 1rem; }
+h3 { font-size: 1.05rem; margin: 1.25rem 0 0.5rem; }
+.field { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 1rem; }
+.field label { font-weight: 600; }
+textarea, select, input[type="file"] {
+  font: inherit;
+  color: var(--fg);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.5rem;
+  max-width: 100%;
+}
+textarea { width: 100%; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.85rem; }
+fieldset {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin: 0 0 1rem;
+  padding: 0.5rem 1rem 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  align-items: center;
+}
+legend { font-weight: 600; padding: 0 0.25rem; }
+fieldset .field { margin: 0; flex-direction: row; align-items: center; gap: 0.5rem; }
+.check { display: flex; align-items: center; gap: 0.4rem; min-height: 32px; }
+.check input { width: 1.1rem; height: 1.1rem; margin: 0; }
+.actions { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-bottom: 0.5rem; }
+button:not([role="tab"]) {
+  font: inherit;
+  min-height: 44px;
+  padding: 0.5rem 1.1rem;
+  border-radius: 6px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--accent-fg);
+  font-weight: 600;
+  cursor: pointer;
+}
+button:disabled { opacity: 0.55; cursor: not-allowed; }
+progress { width: 12rem; max-width: 100%; }
+.status { min-height: 1.5em; margin: 0.25rem 0 0.75rem; }
+.status.error { color: var(--error); font-weight: 600; }
+.hint { color: var(--muted); font-size: 0.9rem; margin: 0.25rem 0 0.5rem; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9em; }
+.drop {
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.drop.over { border-color: var(--accent); background: var(--surface); }
+.drop label { font-weight: 600; }
+.sheet-picker { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; margin: 0.5rem 0; }
+.sheet-picker label { font-weight: 600; }
+.warnings { padding-left: 1.25rem; margin: 0; }
+.warnings li { margin-bottom: 0.25rem; overflow-wrap: anywhere; }
+.sheet-scroll {
+  overflow: auto;
+  max-width: 100%;
+  max-height: 32rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  margin-bottom: 0.75rem;
+}
+table.sheet, table.demo { border-collapse: collapse; font-size: 0.875rem; }
+table.sheet caption, table.demo caption {
+  text-align: left;
+  padding: 0.4rem 0.5rem;
+  font-weight: 600;
+  caption-side: top;
+}
+/* Preview cells keep a light "paper" look so file colours stay readable in dark mode. */
+table.sheet td {
+  background: #ffffff;
+  color: #1a1a1a;
+  border: 1px solid #d0d4d9;
+  padding: 0.2rem 0.45rem;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+table.sheet td.num { text-align: right; font-variant-numeric: tabular-nums; }
+table.sheet th {
+  position: sticky;
+  background: var(--surface);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 0.2rem 0.45rem;
+  font-weight: 500;
+  min-width: 2.5rem;
+}
+table.sheet thead th { top: 0; z-index: 1; }
+table.sheet tbody th { left: 0; text-align: right; }
+table.demo th, table.demo td { border: 1px solid var(--border); padding: 0.35rem 0.6rem; }
+table.demo thead th { background: #0b5cad; color: #ffffff; }
+table.demo tbody th { text-align: left; font-weight: 600; }
+table.demo td[data-type="number"] { text-align: right; }
+@media (max-width: 480px) {
+  header h1 { font-size: 1.35rem; }
+  .tablist [role="tab"] { flex: 1; padding-inline: 0.5rem; }
+  fieldset { gap: 0.25rem 1rem; }
+}
+
+/* react-data-export playground additions */
+input[type="text"], input:not([type]) {
+  font: inherit;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--fg);
+  min-height: 44px;
+  max-width: 100%;
+}
+.dataset-tab { display: grid; gap: 1rem; }
+@media (min-width: 52rem) {
+  .dataset-tab { grid-template-columns: minmax(0, 1fr) 18rem; }
+  .dataset-tab > .editor { grid-column: 1; }
+  .dataset-tab > .options { grid-column: 2; grid-row: 1; align-self: start; }
+  .dataset-tab > :not(.editor):not(.options) { grid-column: 1 / -1; }
+}
+.dataset-tab .options .field { flex-direction: column; align-items: stretch; margin-bottom: 0.75rem; }
+.editor label { font-weight: 600; display: block; margin-bottom: 0.35rem; }
+table.sheet tr.frozen td { font-weight: 600; }
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}

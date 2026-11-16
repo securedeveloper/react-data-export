@@ -6,9 +6,11 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "typecheck": "tsc -p tsconfig.json"
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
   },
   "dependencies": {
+    "javascript-excel": "^2.0.0-alpha.2",
     "react": "^19.3.1",
     "react-data-export": "1.0.0-alpha.0",
     "react-dom": "^19.3.1"

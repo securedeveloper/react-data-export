@@ -57,6 +57,11 @@ jobs:
       - name: Test
         run: npm test
 
+      # The playground's own unit tests (option mapping, preview grid); React 19 only, like its typecheck.
+      - name: Test playground
+        if: matrix.react == 19
+        run: npm test -w playground
+
       - name: Build library
         run: npm run build -w react-data-export
 
