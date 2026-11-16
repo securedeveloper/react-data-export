@@ -11,6 +11,21 @@ const config: UserConfig = defineConfig({
   dts: true,
   sourcemap: false,
   clean: true,
+  // src/index.ts starts with "use client" (docs/api.md §8). With one entry and
+  // no shared chunks rolldown keeps it as the first statement of both builds,
+  // but still warns MODULE_LEVEL_DIRECTIVE. Drop only that warning for that
+  // directive; scripts/smoke.mjs fails if a built file stops starting with it.
+  inputOptions(options) {
+    const next = options.onLog;
+    return {
+      ...options,
+      onLog(level, log, handler) {
+        if (log.code === 'MODULE_LEVEL_DIRECTIVE' && log.message.includes('"use client"')) return;
+        if (next) next(level, log, handler);
+        else handler(level, log);
+      },
+    };
+  },
 });
 
 export default config;
