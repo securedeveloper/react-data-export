@@ -46,9 +46,13 @@ jobs:
       - name: Resolved versions
         run: node scripts/print-versions.mjs
 
-      - name: Typecheck (library + playground)
+      - name: Typecheck (library + playground + docs examples)
         if: matrix.react == 19
         run: npm run typecheck
+
+      - name: Code in the README and docs matches examples/
+        if: matrix.react == 19
+        run: npm run docs:check
 
       - name: Typecheck (library)
         if: matrix.react != 19

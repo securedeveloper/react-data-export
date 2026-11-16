@@ -12,7 +12,8 @@
   },
   "scripts": {
     "build": "npm run build -w react-data-export && npm run build -w playground",
-    "typecheck": "npm run typecheck --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present && tsc -p examples/migration",
+    "docs:check": "node scripts/check-doc-snippets.mjs",
     "test": "npm test -w react-data-export",
     "lint:pkg": "npm run lint:pkg -w react-data-export",
     "smoke": "node scripts/smoke.mjs",

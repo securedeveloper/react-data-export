@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "declaration": false,
+    "isolatedDeclarations": false,
+    "types": ["node"],
+    "paths": {
+      "react-data-export": ["../../packages/react-data-export/src/index.ts"]
+    }
+  },
+  "include": ["*.ts", "*.tsx"]
+}
