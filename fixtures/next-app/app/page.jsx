@@ -3,6 +3,7 @@
 // without running its hooks; without the directive this page fails to build.
 import { ExcelExport } from "react-data-export";
 import HookButton from "./hook-button";
+import TableExport from "./table-export";
 
 const dataset = {
   columns: [{ title: "Name", key: "name" }, { title: "Total", key: "total", numFmt: "#,##0.00" }],
@@ -15,6 +16,7 @@ export default function Page() {
       <h1>Server-rendered page</h1>
       <ExcelExport dataset={dataset} filename="from-server-page" />
       <HookButton />
+      <TableExport />
     </main>
   );
 }
