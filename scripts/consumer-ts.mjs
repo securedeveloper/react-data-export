@@ -53,7 +53,18 @@ if (values.tarball) {
 }
 
 const tsx = `import type { ReactElement } from 'react';
-import { useVersion, version } from 'react-data-export';
+import { isExcelError, sanitizeSheetName, useVersion, version } from 'react-data-export';
+import type { CellInput, CsvWriteOptions, Style, WriteOptions } from 'react-data-export';
+
+// javascript-excel types, re-exported through react-data-export.
+export const header: Style = { font: { bold: true }, fill: 'FFEEAA' };
+export const cell: CellInput = { value: 1, style: header };
+export const csv: CsvWriteOptions = { delimiter: ';', bom: true };
+export const write: WriteOptions = { compression: 'store' };
+export const name: string = sanitizeSheetName('Q1/Q2');
+export const known: boolean = isExcelError(new Error('x'));
+// @ts-expect-error 0.x key: javascript-excel's Font has size, not sz
+export const legacy: Style = { font: { sz: 12 } };
 
 export function Badge(): ReactElement {
   const v: string = useVersion();
@@ -66,7 +77,13 @@ export const notNumber: number = version;
 // @ts-expect-error useVersion takes no arguments
 useVersion(1);
 `;
-const cts = `import { useVersion, version } from 'react-data-export';
+const cts = `import { sanitizeSheetName, useVersion, version } from 'react-data-export';
+import type { Style } from 'react-data-export';
+
+export const s: Style = { font: { italic: true } };
+export const n: string = sanitizeSheetName('a');
+// @ts-expect-error not a Style
+export const bad: Style = { font: 1 };
 
 export const v: string = version;
 export const hook: () => string = useVersion;

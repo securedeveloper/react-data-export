@@ -38,19 +38,29 @@ try {
   writeFileSync(join(app, 'package.json'), JSON.stringify({ name: 'smoke-app', private: true }));
   run('npm', ['install', '--no-audit', '--no-fund', '--loglevel=error', join(work, packed.filename), `react@${reactRange}`, `@types/react@${reactRange}`], app);
 
+  step('"use client" directive is the first statement of both builds');
+  for (const f of ['dist/index.js', 'dist/index.cjs']) {
+    const first = readFileSync(join(app, 'node_modules/react-data-export', f), 'utf8').split('\n', 1)[0].trim();
+    if (first !== '"use client";' && first !== "'use client';") throw new Error(`${f} starts with ${JSON.stringify(first)}, not "use client"`);
+  }
+  console.log('directive ok');
+
   step('ESM import');
   console.log(run('node', ['--input-type=module', '-e', `
     import { version, useVersion } from 'react-data-export';
     if (version !== ${JSON.stringify(pkg.version)}) throw new Error('bad version ' + version);
     if (typeof useVersion !== 'function') throw new Error('useVersion missing');
+    const { isExcelError, sanitizeSheetName } = await import('react-data-export');
+    if (sanitizeSheetName('a/b') !== 'a_b' || isExcelError(new Error('x')) !== false) throw new Error('javascript-excel re-exports broken');
     console.log('esm ok', version);
   `], app).trim());
 
   step('CJS require');
   console.log(run('node', ['-e', `
-    const { version, useVersion } = require('react-data-export');
+    const { version, useVersion, isExcelError, sanitizeSheetName } = require('react-data-export');
     if (version !== ${JSON.stringify(pkg.version)}) throw new Error('bad version ' + version);
     if (typeof useVersion !== 'function') throw new Error('useVersion missing');
+    if (sanitizeSheetName('a/b') !== 'a_b' || isExcelError(new Error('x')) !== false) throw new Error('javascript-excel re-exports broken');
     console.log('cjs ok', version);
   `], app).trim());
 
