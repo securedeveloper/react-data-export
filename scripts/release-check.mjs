@@ -21,7 +21,8 @@
 // Writes `release`, `name`, `version`, `dist-tag`, `prerelease`, `published`
 // (name@version already on npm), `version-changed` (differs from HEAD~1) and
 // `tag` (run the idempotent tag + GitHub Release step: version changed, or a
-// manual run) to $GITHUB_OUTPUT, a one-line verdict to $GITHUB_STEP_SUMMARY
+// manual run; not for a package.json new at its path whose version is already
+// on npm, i.e. a moved package) to $GITHUB_OUTPUT, a one-line verdict to $GITHUB_STEP_SUMMARY
 // and, when `tag` is true, the release notes to --notes-out: that version's
 // section of <package dir>/CHANGELOG.md, or a one-line fallback.
 //
@@ -87,7 +88,10 @@ export function decide({ name, version, previousVersion, publishedVersion, isPri
     // successful publish but a failed `gh release create` still tags it.
     versionChanged: previousVersion !== version,
     // A manual run may also (re)create a missing tag/Release for the current version.
-    tag: previousVersion !== version || manual,
+    // A package.json that is new at this path (no HEAD~1 version) with a version
+    // already on npm is a moved package (e.g. root -> packages/<name>), not a
+    // release: no tag. A real first release (new path, unpublished) still tags.
+    tag: manual || (previousVersion !== version && (previousVersion !== null || !publishedVersion)),
     // A manual run that must not act at all; the CLI exits non-zero.
     refused: false,
   };
@@ -113,7 +117,8 @@ export function decide({ name, version, previousVersion, publishedVersion, isPri
     return { ...base, release: false, reason: `version ${version} unchanged since the previous commit` };
   }
   if (publishedVersion) {
-    return { ...base, release: false, reason: `${name}@${version} is already on npm` };
+    const moved = previousVersion === null ? " (package.json is new at this path: moved, not released; no tag)" : "";
+    return { ...base, release: false, reason: `${name}@${version} is already on npm${moved}` };
   }
   const from = previousVersion ? `${previousVersion} -> ${version}` : `new ${version}`;
   return { ...base, release: true, reason: `${from}, not on npm yet: publish with --tag ${distTag}` };

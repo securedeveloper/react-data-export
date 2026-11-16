@@ -53,6 +53,27 @@ describe("decide", () => {
       input: { version: "0.1.0", previousVersion: null, publishedVersion: null },
       expect: { release: true, distTag: "latest" },
     },
+    // OPS-10: a package.json that is new at its path (moved from the repo root into packages/<name>).
+    {
+      title: "moved package (new path, version already on npm): no release, no tag",
+      input: { version: "0.0.1", previousVersion: null, publishedVersion: "0.0.1" },
+      expect: { release: false, published: true, versionChanged: true, tag: false },
+    },
+    {
+      title: "new path and unpublished (a real first release): release and tag",
+      input: { version: "0.1.0", previousVersion: null, publishedVersion: null },
+      expect: { release: true, published: false, versionChanged: true, tag: true },
+    },
+    {
+      title: "re-run after a publish whose tag step failed (previous version known): still tag",
+      input: { version: "0.1.0", previousVersion: "0.0.1", publishedVersion: "0.1.0" },
+      expect: { release: false, published: true, versionChanged: true, tag: true },
+    },
+    {
+      title: "manual run on a moved, published package: (re)creates a missing tag",
+      input: { version: "0.0.1", previousVersion: null, publishedVersion: "0.0.1", manual: true, changelogHasVersion: true },
+      expect: { release: false, published: true, tag: true },
+    },
     {
       title: "private package: never",
       input: { version: "1.1.0", previousVersion: "1.0.0", publishedVersion: null, isPrivate: true },

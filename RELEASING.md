@@ -70,6 +70,7 @@ The job also checks that npm is at least 11.5.1, which trusted publishing requir
 Re-running the job is safe:
 - After a failed publish, the version is still unpublished, so the re-run publishes.
 - After a successful publish but a failed tag/Release step, the re-run skips publishing and creates the missing tag and Release.
+- Moving the package is not a release. When its `package.json` is new at its path (for example, moved from the repository root to `packages/<name>`) and that version is already on npm, nothing is published and no tag or GitHub Release is created.
 - If everything already succeeded, the re-run does nothing.
 
 ### Recovery: run the release by hand
