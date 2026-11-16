@@ -52,8 +52,9 @@ if (values.tarball) {
   console.log(`packed ${packed.filename}`);
 }
 
-const tsx = `import type { ReactElement } from 'react';
-import { ExcelExport, exportDataset, isExcelError, sanitizeSheetName, useExcelExport, version } from 'react-data-export';
+const tsx = `import { useRef, type ReactElement } from 'react';
+import { ExcelExport, ExportTableButton, exportDataset, exportTable, isExcelError, sanitizeSheetName, useExcelExport, useTableExport, version } from 'react-data-export';
+import type { FromTableOptions, TableRef } from 'react-data-export';
 import type { CellInput, CsvWriteOptions, Dataset, ExportResult, Style, WriteOptions } from 'react-data-export';
 
 interface Row { name: string; n: number }
@@ -79,6 +80,25 @@ export function Buttons(): ReactElement {
 
 export const done: Promise<ExportResult> = exportDataset(ds, { format: 'csv', csv: { delimiter: ';' }, download: false });
 
+// Table export: a useRef<HTMLTableElement>(null) from any @types/react fits TableRef.
+export function TablePage(): ReactElement {
+  const ref = useRef<HTMLTableElement>(null);
+  const hook = useTableExport(ref, { filename: 'orders', freezeHeader: true });
+  const asRef: TableRef = ref;
+  const fromTableOptions: FromTableOptions = { header: 'thead', styles: 'computed', autoWidth: true };
+  return (
+    <div>
+      <table ref={ref} />
+      <ExportTableButton tableRef={ref} filename="orders" autoFilter onExported={(r: ExportResult) => r.warnings}>
+        Export orders
+      </ExportTableButton>
+      <ExportTableButton tableRef={asRef} format="csv">{({ run, status }) => <button onClick={() => void run()}>{status}</button>}</ExportTableButton>
+      <button onClick={() => void hook.exportTable({ ...fromTableOptions, format: 'csv' })}>{hook.status}</button>
+      <button onClick={() => void exportTable(ref, { name: 'Orders', download: false })}>direct</button>
+    </div>
+  );
+}
+
 // javascript-excel types, re-exported through react-data-export.
 export const header: Style = { font: { bold: true }, fill: 'FFEEAA' };
 export const cell: CellInput = { value: 1, style: header };
@@ -96,6 +116,10 @@ exportDataset(ds, { format: 'xls' });
 export const wrong: Dataset<Row> = { columns: [{ title: 'x', value: (r) => r.missing }], data: [] };
 // @ts-expect-error version is a string
 export const notNumber: number = version;
+// @ts-expect-error not a fromTable option value
+export const badHeader: FromTableOptions = { header: 'tbody' };
+// @ts-expect-error tableRef is required
+export const noRef: ReactElement = <ExportTableButton filename="x" />;
 `;
 const cts = `import { exportWorkbook, sanitizeSheetName, version } from 'react-data-export';
 import type { ExportResult, Style, WorkbookSpec } from 'react-data-export';

@@ -62,8 +62,8 @@ export interface WorkbookSpec {
 
 const EXPORT_KEYS = ['filename', 'format', 'download', 'write', 'csv', 'properties', 'signal', 'onProgress'] as const;
 
-/** Splits ExportOptions from the DatasetOptions passed alongside them. */
-function splitOptions<O extends object>(options: O): { exportOptions: ExportOptions; rest: Omit<O, (typeof EXPORT_KEYS)[number]> } {
+/** Splits ExportOptions from the builder options passed alongside them. Internal (also used by table.ts). */
+export function splitOptions<O extends object>(options: O): { exportOptions: ExportOptions; rest: Omit<O, (typeof EXPORT_KEYS)[number]> } {
   const exportOptions: Record<string, unknown> = {};
   const rest: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(options)) {
@@ -73,7 +73,8 @@ function splitOptions<O extends object>(options: O): { exportOptions: ExportOpti
   return { exportOptions: exportOptions as ExportOptions, rest: rest as Omit<O, (typeof EXPORT_KEYS)[number]> };
 }
 
-function formatOf(options: ExportOptions): ExportFormat {
+/** Internal. */
+export function formatOf(options: ExportOptions): ExportFormat {
   const format = options.format ?? 'xlsx';
   if (format !== 'xlsx' && format !== 'csv') {
     throw new TypeError(`react-data-export: unknown format ${JSON.stringify(format)}; expected 'xlsx' or 'csv'`);
@@ -88,14 +89,15 @@ export function resolveFilename(filename: string | undefined, format: ExportForm
   return base.toLowerCase().endsWith(ext) ? base : `${base}${ext}`;
 }
 
-function throwIfAborted(signal: AbortSignal | undefined): void {
+/** Internal. */
+export function throwIfAborted(signal: AbortSignal | undefined): void {
   if (signal?.aborted) {
     throw signal.reason ?? new DOMException('This operation was aborted', 'AbortError');
   }
 }
 
-/** Wraps onWarning so every warning is also collected for the result. */
-function collecting(
+/** Wraps onWarning so every warning is also collected for the result. Internal. */
+export function collecting(
   warnings: ExcelWarning[],
   onWarning: ((w: ExcelWarning) => void) | undefined,
 ): (w: ExcelWarning) => void {
@@ -105,7 +107,8 @@ function collecting(
   };
 }
 
-async function writeAndSave(
+/** Write (toBlob / toCsvBlob), then download unless `download: false`. Internal. */
+export async function writeAndSave(
   sheets: Sheet[],
   activeSheet: number | undefined,
   warnings: ExcelWarning[],

@@ -10,6 +10,10 @@ export { useExcelExport } from './use-excel-export';
 export type { ExportStatus, UseExcelExport } from './use-excel-export';
 export { ExcelExport } from './excel-export';
 export type { ExcelExportProps, ExcelExportRenderApi } from './excel-export';
+export { exportTable } from './table';
+export type { TableRef, TableTarget } from './table';
+export { ExportTableButton, useTableExport } from './table-react';
+export type { ExportTableButtonProps, UseTableExport } from './table-react';
 
 export type {
   CellInput,
@@ -26,6 +30,7 @@ export type {
   WriteOptions,
 } from 'javascript-excel';
 export type { CsvWriteOptions } from 'javascript-excel/csv';
+export type { FromTableOptions, TableCellElement, TableElement } from 'javascript-excel/dom';
 export { isExcelError, sanitizeSheetName } from 'javascript-excel';
 
 /** The published version of react-data-export. */
