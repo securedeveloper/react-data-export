@@ -24,6 +24,8 @@ Export data from React to `.xlsx` and `.csv`.
 
 ## Migrating from 0.x
 
+**Quick path: `react-data-export/legacy`.** To run 0.x code on 1.0 without rewriting it yet, change the import to `import ReactExport from 'react-data-export/legacy'`. That entry has `<ExcelFile>`, `<ExcelSheet>`, `<ExcelColumn>`, the `dataSet` shape and xlsx-style styles. It writes the same files as 0.6.0, without 0.6's bugs: one download under StrictMode, and real CSV. It's **deprecated**: supported for all of 1.x, removed in 2.0, with one development warning. See the guide's [quick path](docs/migration.md#11-quick-path-react-data-exportlegacy).
+
 The [migration guide](docs/migration.md) shows every 0.x pattern next to its 1.0 code: `ExcelFile` + `ExcelSheet` + `ExcelColumn`, `dataSet` with `xSteps`/`ySteps`, `hideElement`, `element`, `fileExtension`, and the xlsx-style cell styles (with a converter). It also lists every intentional behaviour difference. The most common change:
 
 ```jsx

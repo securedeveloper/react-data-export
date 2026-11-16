@@ -37,6 +37,16 @@
         "default": "./dist/index.cjs"
       }
     },
+    "./legacy": {
+      "import": {
+        "types": "./dist/legacy.d.ts",
+        "default": "./dist/legacy.js"
+      },
+      "require": {
+        "types": "./dist/legacy.d.cts",
+        "default": "./dist/legacy.cjs"
+      }
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -53,7 +63,7 @@
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint:pkg": "publint --strict && attw --pack ."
+    "lint:pkg": "publint --strict && attw --pack . --profile node16"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",

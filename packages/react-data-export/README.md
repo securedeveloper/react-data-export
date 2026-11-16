@@ -27,4 +27,6 @@ function Orders() {
 
 There are also plain async functions (`exportDataset`, `exportWorkbook`, `exportTable`) and hooks (`useExcelExport`, `useTableExport`). Every export resolves with `{ blob, filename, format, warnings }`. The full API is in [docs/api.md](https://github.com/securedeveloper/react-data-export/blob/main/docs/api.md).
 
+Moving from 0.x in steps? `react-data-export/legacy` keeps `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` working on 1.0 (deprecated, removed in 2.0); see the [quick path](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy).
+
 React 17, 18 and 19; TypeScript 5.0+. MIT licensed.

@@ -46,6 +46,7 @@ One entry, `react-data-export`, ESM + CJS + `.d.ts`, `sideEffects: false`. It ex
 | `exportTable`, `useTableExport`, `ExportTableButton` | function, hook, component | §13 |
 | `isExcelError`, `sanitizeSheetName` | re-exports from `javascript-excel` | §7, §4.2 |
 | `version` | `string` | |
+| **`react-data-export/legacy`** (a separate entry): `ExcelFile`, `ExcelSheet`, `ExcelColumn`, the 0.x default export, `convertLegacyStyle` | **deprecated** 0.x components on this API; removed in 2.0 | [migration.md §1.1](migration.md#11-quick-path-react-data-exportlegacy) |
 | types: `Dataset`, `ColumnDef`, `LeafColumn`, `GroupColumn`, `DatasetOptions`, `Style`, `CellInput`, `CsvWriteOptions`, `WriteOptions`, `Progress`, `ExcelWarning` | type re-exports from `javascript-excel` (and `javascript-excel/csv`) | §3 |
 | types: `ExportOptions`, `ExportFormat`, `ExportResult`, `WorkbookSpec`, `SheetSpec`, `ExportStatus`, `UseExcelExport`, `ExcelExportProps` | react-data-export's own | §4–§6 |
 | types: `FromTableOptions`, `TableElement`, `TableCellElement` | type re-exports from `javascript-excel/dom` | §13 |
