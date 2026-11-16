@@ -22,7 +22,7 @@ When a release makes sense (Afzal or the team lead decides):
 
 ```sh
 git switch -c release-<version> origin/main
-npm run version-packages     # changeset version + lockfile sync
+npm run version-packages     # changeset version + version constant + lockfile sync
 git diff                     # review the version bump and CHANGELOG.md
 ```
 
@@ -32,7 +32,9 @@ git diff                     # review the version bump and CHANGELOG.md
 - writes `packages/react-data-export/CHANGELOG.md`,
 - updates the playground's dependency on the package.
 
-It then runs `npm install --package-lock-only`. Without that step, `package-lock.json` would still list the old version, and `npm ci` (in CI and in the release job) would fail.
+It then runs `scripts/sync-version.mjs`, which sets the `version` constant in `packages/react-data-export/src/index.ts` to the new version (`changeset version` never edits source files). It fails if it can't find exactly one such constant, so renaming the constant can't silently break the sync.
+
+Finally it runs `npm install --package-lock-only`. Without that step, `package-lock.json` would still list the old version, and `npm ci` (in CI and in the release job) would fail.
 
 Open the pull request. Its **Release dry run** CI job shows what merging would do. The "Release preview" step says which version would be published, or "no release". The job also runs `npm publish --dry-run` with the dist-tag that would be used.
 
