@@ -10,9 +10,9 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "javascript-excel": "^2.0.0-alpha.2",
+    "javascript-excel": "^2.0.0-alpha.3",
     "react": "^19.3.1",
-    "react-data-export": "1.0.0-alpha.1",
+    "react-data-export": "1.0.0-alpha.2",
     "react-dom": "^19.3.1"
   },
   "devDependencies": {
