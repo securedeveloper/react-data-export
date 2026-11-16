@@ -1,6 +1,6 @@
 # react-data-export 1.0: issue and pull request triage plan
 
-Status: **decided (2026-11-16). Afzal accepted every recommendation:**
+Status: **decided (2026-11-16). Afzal accepted every recommendation.** Revised after `react-data-export/legacy` (1.0.0-alpha.2): the footer gained one sentence, and the comments for #138, #141, #155, #160 and the thank-yous for #143, #171, #176 mention `/legacy`. **The revision awaits Afzal's re-approval.** The decisions:
 1. the comment texts below are approved as written;
 2. the "fixed" issues are closed when `1.0.0-alpha.1` is published, not at 1.0.0;
 3. the credit lines go into the 1.0.0-alpha.1 changelog (as a patch changeset in the release PR, #195);
@@ -20,7 +20,7 @@ Snapshot: 68 open issues and 8 open community pull requests, fetched 2026-11-16.
 
 Every comment ends with the same footer:
 
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 ## 1. Community pull requests
 
@@ -28,20 +28,20 @@ Every comment ends with the same footer:
 
 | PR | author | idea | where it landed in 1.0 |
 |---|---|---|---|
-| #143 | @samuelhulla | Correct the `ExcelCell` typing (#141) | Cells are javascript-excel's `CellInput` (a value, or `{ value, style, formula, hyperlink }`), re-exported; the types are generated from the source and checked on TypeScript 5.0–7.0. |
+| #143 | @samuelhulla | Correct the `ExcelCell` typing (#141) | Cells are javascript-excel's `CellInput` (a value, or `{ value, style, formula, hyperlink }`), re-exported; the types are generated from the source and checked on TypeScript 5.0–7.0. And `react-data-export/legacy` has the `ExcelCell` type with exactly this fix, `value: ExcelValue`. |
 | #161 | @atefBB | Document the real `alignment.horizontal` values | Alignment is javascript-excel's documented `Alignment` type (`horizontal: 'left' \| 'center' \| 'right' \| …`), so editors autocomplete the valid values. |
 | #165 | @mehmetyilmaz001 | Nested object access in columns (`user.name`, #164) | Column `path`: `{ path: 'user.name' }` (and `'items[0].name'`), in javascript-excel's `fromDataset`. |
 | #167 | @apperside | A callback after the file is generated | Every export returns a promise, `<ExcelExport onExported>` and `onError`, and the hook's `status`/`result`. |
-| #171 | @xaviergeorge | Fix the `ExcelCell` value type (#141) | Same as #143: `CellInput` from javascript-excel. |
+| #171 | @xaviergeorge | Fix the `ExcelCell` value type (#141) | Same as #143: `CellInput` from javascript-excel, and `react-data-export/legacy`'s `ExcelCell` with `value: ExcelValue`. |
 | #174 | @tobwithu | Make the types work with React + TypeScript | Types ship in the package (`.d.ts` and `.d.cts` through the `exports` map) and a consumer project is type-checked in CI on every TypeScript minor 5.0–7.0. |
-| #176 | @saeedkhal | Skip falsy (conditional) columns | Falsy entries in `columns` are skipped, and falsy entries in `sheets` too. |
+| #176 | @saeedkhal | Skip falsy (conditional) columns | Falsy entries in `columns` are skipped, and falsy entries in `sheets` too; `react-data-export/legacy` skips falsy `<ExcelColumn>` and `<ExcelSheet>` children the same way. |
 | #180 | @imsuvesh | Ship the type declarations where npm resolves them (#179, #146, #64) | Same as #174: declarations in `dist/`, resolved through `exports`, verified by publint and are-the-types-wrong. |
 
 ### Draft thank-you comments
 
 **#143** (close):
 
-> Thank you @samuelhulla, and sorry this waited so long. react-data-export 1.0 is a from-scratch rewrite on javascript-excel 2.0, so this PR can't be merged into the new code, but its idea is in 1.0: Cells are javascript-excel's `CellInput` (a value, or `{ value, style, formula, hyperlink }`), re-exported; the types are generated from the source and checked on TypeScript 5.0–7.0. You're credited in the 1.0.0-alpha.1 changelog. Try it with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) covers the move from 0.x. Closing in favour of 1.0; thanks again for contributing.
+> Thank you @samuelhulla, and sorry this waited so long. react-data-export 1.0 is a from-scratch rewrite on javascript-excel 2.0, so this PR can't be merged into the new code, but its idea is in 1.0: Cells are javascript-excel's `CellInput` (a value, or `{ value, style, formula, hyperlink }`), re-exported; the types are generated from the source and checked on TypeScript 5.0–7.0. And `react-data-export/legacy` has the `ExcelCell` type with exactly this fix, `value: ExcelValue`. You're credited in the 1.0.0-alpha.1 changelog. Try it with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) covers the move from 0.x. Closing in favour of 1.0; thanks again for contributing.
 
 **#161** (close):
 
@@ -57,7 +57,7 @@ Every comment ends with the same footer:
 
 **#171** (close):
 
-> Thank you @xaviergeorge, and sorry this waited so long. react-data-export 1.0 is a from-scratch rewrite on javascript-excel 2.0, so this PR can't be merged into the new code, but its idea is in 1.0: Same as #143: `CellInput` from javascript-excel. You're credited in the 1.0.0-alpha.1 changelog. Try it with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) covers the move from 0.x. Closing in favour of 1.0; thanks again for contributing.
+> Thank you @xaviergeorge, and sorry this waited so long. react-data-export 1.0 is a from-scratch rewrite on javascript-excel 2.0, so this PR can't be merged into the new code, but its idea is in 1.0: Same as #143: `CellInput` from javascript-excel, and `react-data-export/legacy`'s `ExcelCell` with `value: ExcelValue`. You're credited in the 1.0.0-alpha.1 changelog. Try it with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) covers the move from 0.x. Closing in favour of 1.0; thanks again for contributing.
 
 **#174** (close):
 
@@ -65,7 +65,7 @@ Every comment ends with the same footer:
 
 **#176** (close):
 
-> Thank you @saeedkhal, and sorry this waited so long. react-data-export 1.0 is a from-scratch rewrite on javascript-excel 2.0, so this PR can't be merged into the new code, but its idea is in 1.0: Falsy entries in `columns` are skipped, and falsy entries in `sheets` too. You're credited in the 1.0.0-alpha.1 changelog. Try it with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) covers the move from 0.x. Closing in favour of 1.0; thanks again for contributing.
+> Thank you @saeedkhal, and sorry this waited so long. react-data-export 1.0 is a from-scratch rewrite on javascript-excel 2.0, so this PR can't be merged into the new code, but its idea is in 1.0: Falsy entries in `columns` are skipped, and falsy entries in `sheets` too; `react-data-export/legacy` skips falsy `<ExcelColumn>` and `<ExcelSheet>` children the same way. You're credited in the 1.0.0-alpha.1 changelog. Try it with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) covers the move from 0.x. Closing in favour of 1.0; thanks again for contributing.
 
 **#180** (close):
 
@@ -245,409 +245,409 @@ Each comment is followed by the footer above. "Close" means close after posting;
 
 > Fixed in react-data-export 1.0.0-alpha.1: CSV is a first-class format: `format: 'csv'` on any export. Legacy `.xls` and PDF aren't supported: `.xls` is on javascript-excel's [roadmap](https://github.com/securedeveloper/javascript-excel/blob/main/docs/api.md#13-roadmap-beyond-20) (4.x), PDF isn't planned. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#64** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: 1.0 is written in TypeScript and ships its declarations. CI type-checks a consumer project on every TypeScript minor from 5.0 to 7.0. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#75** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: several datasets on one sheet are `blocks`: `exportWorkbook({ sheets: [{ name: 'Report', blocks: [first, second] }] })`. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#76** (keep open):
 
 > Update for 1.0: 1.0 writes files with a new engine whose output is checked by LibreOffice and openpyxl in CI. Before closing, we'll confirm that a 1.0 file opens in Excel for Mac; if you can try `react-data-export@next`, a report here would help.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#81** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: `exportWorkbook({ sheets, activeSheet: 1 })` opens the file on the second sheet. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#85** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: the 0.x import errors came from the `tempa-xlsx`/`xlsx` dependency chain. 1.0 depends only on javascript-excel (itself dependency-free) and imports as `import { ExcelExport } from 'react-data-export'`. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#87** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: a title above each dataset is a header group: `columns: [{ title: 'Q1 sales', children: [...the columns...] }]`, and with `blocks` each dataset gets its own. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#88** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: header cells are styled with `headerStyle`, per sheet or per column. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#89** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: 1.0 exports from code without a component: `await exportDataset({ columns, data }, { filename: 'report' })`, or `useExcelExport()` in a component. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#90** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: 1.0 ships ESM, CommonJS and type declarations through a standard `exports` map, and CI installs the packed tarball in a clean project on every change. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#91** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: header cells merge through header groups, and any `colspan`/`rowspan` in an HTML table becomes a merge with `exportTable` / `<ExportTableButton>`. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#92** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: right alignment is `style: { alignment: { horizontal: 'right' } }` on a column or cell (`readingOrder` controls text direction, not alignment). If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#94** (keep open):
 
 > Update for 1.0: multi-sheet workbooks are written by 1.0's new engine and validated by LibreOffice and openpyxl in CI. Before closing, we'll confirm Excel opens a 1.0 multi-sheet file without 'Recover'; a report with `react-data-export@next` would help.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#95** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: colspan: header groups or `exportTable` on a `colspan` table; header styles: `headerStyle`. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#96** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: merges come from header groups or from `colspan`/`rowspan` in a table exported with `exportTable`. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#97** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: automatic widths: `width: 'auto'` on a column, or `autoWidth: true` for the sheet. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#98** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: header groups are `{ title: 'Q1', children: [{ title: 'Jan', key: 'jan' }, ...] }`, written as merged header cells. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#99** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: hyperlinks are cells: `value: (r) => ({ value: r.name, hyperlink: { target: r.url } })`; `<a href>` in an exported table becomes a link too. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#100** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: 1.0 doesn't use `prop-types` (props are typed in TypeScript), so this resolution error can't occur. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#101** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: pass `header: false` to leave out the header row. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#102** (close):
 
 > Thanks for the report. Closing as out of scope for 1.0: images aren't supported yet. javascript-excel plans images in 2.x ([roadmap](https://github.com/securedeveloper/javascript-excel/blob/main/docs/api.md#13-roadmap-beyond-20)); react-data-export will pick them up from there.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#103** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: a totals row is `total: 'sum'` on a column, and any cell can be a formula: `value: () => ({ formula: 'SUM(A2:B2)' })`. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#107** (close):
 
 > Thanks for the report. Closing as out of scope for 1.0: filling an existing file isn't something react-data-export 1.0 does. javascript-excel can read a workbook (`javascript-excel/read`), and template write-back (`.xltx`) is planned in its 2.x ([roadmap](https://github.com/securedeveloper/javascript-excel/blob/main/docs/api.md#13-roadmap-beyond-20)).
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#109** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: `rightToLeft: true` makes the whole sheet right-to-left. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#110** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: 1.0 no longer pulls in `xlsx`/`tempa-xlsx`. It builds on javascript-excel, which has no runtime dependencies and splits writer, CSV and DOM code into separate entries so bundlers only keep what you use. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#111** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: number formats are per column: `{ title: 'Amount', key: 'amount', numFmt: '#,##0.00' }`. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#112** (close):
 
 > Thanks for the report. Closing as out of scope for 1.0: Android WebViews don't handle browser downloads of blob URLs, so no web library can trigger them there. In 1.0, `exportDataset(ds, { download: false })` returns the file as a `Blob` that your app can hand to its native bridge.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#113** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: styles apply per column (`style`, `headerStyle`) whatever the data shape. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#114** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: centre with `alignment: { horizontal: 'center' }` and add borders with `border: { top: { style: 'thin' }, ... }`. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#126** (close):
 
 > Thanks for the report. Closing as out of scope for 1.0: dropdowns are data validation, planned in javascript-excel 2.x ([roadmap](https://github.com/securedeveloper/javascript-excel/blob/main/docs/api.md#13-roadmap-beyond-20)).
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#127** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: colspan: header groups (`children`) for datasets, or `exportTable` for an HTML table with `colspan`. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#129** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: column widths are `width: { wch: 20 }` (characters) or `{ wpx: 120 }` (pixels). If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#130** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: this crash came from the 0.x engine, which 1.0 no longer uses. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#133** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: borders are written: `border: { top: { style: 'thick', color: 'FFAA00' }, ... }`. Note the 0.x shape `{ style, color }` at the top level isn't a border; each side is its own entry. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#134** (keep open):
 
 > Update for 1.0: in 1.0 a second block can sit next to the first with a negative row offset (`blocks: [a, { ...b, offset: { rows: -3, cols: 2 } }]` for a 3-row first block). That works but isn't obvious, so we're keeping this open for a clearer side-by-side option in javascript-excel's `fromDatasets`.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#135** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: the 1.0 prerelease is out. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#138** (close):
 
-> Fixed in react-data-export 1.0.0-alpha.1: 0.x wrote an xlsx-style payload with a `.csv` name. 1.0 writes real CSV (RFC 4180, UTF-8 with BOM so Excel detects it): `exportDataset(ds, { format: 'csv' })`. If this still happens with 1.0, please open a new issue with a small example.
+> Fixed in react-data-export 1.0.0-alpha.1: 0.x wrote an xlsx-style payload with a `.csv` name. 1.0 writes real CSV (RFC 4180, UTF-8 with BOM so Excel detects it): `exportDataset(ds, { format: 'csv' })`, or `fileExtension="csv"` with `react-data-export/legacy` (since 1.0.0-alpha.2). If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#139** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: `type: 'date'` writes real Excel dates, so filters treat them as dates: `{ title: 'Joined', key: 'joined', type: 'date' }`. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#140** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: the rewrite is out as a prerelease. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#141** (close):
 
-> Fixed in react-data-export 1.0.0-alpha.1: the 0.x `ExcelCell` type is gone; cells are javascript-excel's `CellInput` (a value, or `{ value, style, formula, hyperlink }`), re-exported from react-data-export. If this still happens with 1.0, please open a new issue with a small example.
+> Fixed in react-data-export 1.0.0-alpha.1: in the 1.0 API, cells are javascript-excel's `CellInput` (a value, or `{ value, style, formula, hyperlink }`), re-exported from react-data-export. For 0.x code, `react-data-export/legacy` (since 1.0.0-alpha.2) has an `ExcelCell` type with the corrected `value: ExcelValue`. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#145** (close):
 
 > Thanks for the report. Closing as out of scope for 1.0: images aren't supported yet; they're planned in javascript-excel 2.x ([roadmap](https://github.com/securedeveloper/javascript-excel/blob/main/docs/api.md#13-roadmap-beyond-20)).
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#146** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: 1.0 ships its own type declarations; no `@types` package is needed. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#147** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: nested data is a column `path`: `{ title: 'City', path: 'address[0].city' }`. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#149** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: this crash was in the 0.x style code. 1.0 styles headers with `headerStyle` through javascript-excel's writer. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#150** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: sub headers are header groups: `{ title: 'Group', children: [...] }`. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#151** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: a computed column handles arrays: `{ title: 'Phones', value: (r) => r.phone_nums.join(', ') }`. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#152** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: `autoWidth: true` sizes columns from their text. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#153** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: javascript-excel compresses every part with deflate and uses a shared-strings table by default. If a 1.0 file is still much bigger than Excel's, please attach both files to a new issue. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#154** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: there's no row limit in 1.0. On the prerelease, 100,000 rows export and read back completely. If you hit a limit, please share the row and column counts in a new issue. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#155** (close):
 
-> Fixed in react-data-export 1.0.0-alpha.1: conditional columns work: falsy entries in `columns` are skipped, e.g. `isAdmin && { title: 'Salary', key: 'salary' }`. If this still happens with 1.0, please open a new issue with a small example.
+> Fixed in react-data-export 1.0.0-alpha.1: conditional columns work: falsy entries in `columns` are skipped, e.g. `isAdmin && { title: 'Salary', key: 'salary' }`. With `react-data-export/legacy` (since 1.0.0-alpha.2), a falsy `<ExcelColumn>` child like the one in this report is skipped too. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#157** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: group titles are header groups (`children`), and `rightToLeft: true` flips the sheet. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#159** (close):
 
 > Thanks for the report. Closing as out of scope for 1.0: this report is about `react-export-excel`, a separate fork that this project doesn't publish or maintain, so we can't fix its install. react-data-export 1.0 installs from npm without git.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#160** (close):
 
-> Fixed in react-data-export 1.0.0-alpha.1: conditional sheets work: falsy entries in `workbook.sheets` are skipped. If this still happens with 1.0, please open a new issue with a small example.
+> Fixed in react-data-export 1.0.0-alpha.1: conditional sheets work: falsy entries in `workbook.sheets` are skipped. With `react-data-export/legacy` (since 1.0.0-alpha.2), a falsy `<ExcelSheet>` child like the one in this report is skipped too. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#162** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: `rightToLeft: true` on the sheet sets right-to-left column order. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#163** (close):
 
 > Thanks for the report. Closing as out of scope for 1.0: legacy `.xls` (Excel 97–2003) isn't written by javascript-excel 2.0, the engine behind 1.0. It's on javascript-excel's [roadmap](https://github.com/securedeveloper/javascript-excel/blob/main/docs/api.md#13-roadmap-beyond-20) (4.x). `.xlsx` opens in every Excel version since 2007.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#164** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: use a column `path`: `{ title: 'Name', path: 'user.name' }`. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#168** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: the `fs` import came from `tempa-xlsx`, which 1.0 no longer uses. CI now builds Vite, Next.js, Create React App (webpack 5) and React 17 + TypeScript apps against the packed package. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#169** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: 1.0 doesn't depend on `xlsx` at all, so nothing extra is added to your `package.json`. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#170** (keep open):
 
 > Update for 1.0: 1.0's writer (javascript-excel) works in small chunks so the page stays responsive, and 100,000-row exports finish in well under a second in our measurements. Running the export in a Web Worker is planned for react-data-export 1.x; keeping this open until it ships.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#172** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: export an HTML table with `<ExportTableButton tableRef={ref} />` or `exportTable(ref)`; `colspan`/`rowspan` become merges. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#173** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: `cptable` came from the old `xlsx` fork. 1.0 has none of that code, and CI builds a Vite + React 19 app against the packed package. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#175** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: a label plus a summed total is `total: 'sum'` on the column and `totals: { label: 'Total' }` on the sheet. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#177** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: this was the old `tempa-xlsx` dynamic `require`. It's gone in 1.0, and a Vite app is part of CI. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#178** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: every export returns a promise, so several files from one click is `await Promise.all([exportDataset(a, { filename: 'a' }), exportDataset(b, { filename: 'b' })])`. Bundling them into one zip isn't part of the library. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#179** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: react-data-export 1.0 ships its own types (the import in the report is the separate `react-export-excel` fork, which this project doesn't publish). If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#181** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: the 0.x style docs are replaced by javascript-excel's style model; `alignment: { horizontal, vertical }` is documented there. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#182** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: 1.0 doesn't use `jszip`; javascript-excel writes the zip container itself with the platform's `CompressionStream`. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 **#183** (close):
 
 > Fixed in react-data-export 1.0.0-alpha.1: 1.0 is tested on React 17, 18 and 19 in CI, and you no longer import `xlsx` alongside it. If this still happens with 1.0, please open a new issue with a small example.
 >
-> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged.
+> react-data-export 1.0 is a rewrite on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0. Try the prerelease with `npm install react-data-export@next`; the [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) maps every 0.x pattern. 0.6.x stays on npm unchanged. Already have 0.x code? [`react-data-export/legacy`](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy) runs `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` on 1.0 with one import change (deprecated: supported for all of 1.x, removed in 2.0).
 
 ## 4. Follow-ups found while triaging
 
