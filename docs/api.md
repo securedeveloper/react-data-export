@@ -1,6 +1,6 @@
 # react-data-export 1.0: API design (dataset module)
 
-Status: **design, decided (2026-11-16)**: every question in [§12](#12-design-decisions) is decided. Nothing here is implemented yet. The code (RDE-1.9) needs **javascript-excel ≥ 2.0.0-alpha.2**, the first prerelease with `fromDataset`/`fromDatasets` (see [§9](#9-dependencies-and-order)).
+Status: **design decided (2026-11-16); the dataset module is implemented** (RDE-1.9) on **javascript-excel ≥ 2.0.0-alpha.2** (see [§9](#9-dependencies-and-order)). It is not published yet. Table export (module B) comes later.
 
 This document covers module A, **dataset export**: `exportDataset`, `exportWorkbook`, `useExcelExport` and `<ExcelExport>`. Module B, table export (`exportTable`, `useTableExport`, `<ExportTableButton>`), gets its own section in a later change (RDE-1.17).
 
@@ -47,7 +47,7 @@ One entry, `react-data-export`, ESM + CJS + `.d.ts`, `sideEffects: false`. It ex
 | types: `Dataset`, `ColumnDef`, `LeafColumn`, `GroupColumn`, `DatasetOptions`, `Style`, `CellInput`, `CsvWriteOptions`, `WriteOptions`, `Progress`, `ExcelWarning` | type re-exports from `javascript-excel` (and `javascript-excel/csv`) | §3 |
 | types: `ExportOptions`, `ExportFormat`, `ExportResult`, `WorkbookSpec`, `SheetSpec`, `ExportStatus`, `UseExcelExport`, `ExcelExportProps` | react-data-export's own | §4–§6 |
 
-`javascript-excel` is a regular **dependency**, not a peer: users install `react-data-export` only. The `version` export stays, kept in sync by `npm run version-packages`. `useVersion`, the scaffold placeholder, is removed when the real API lands.
+`javascript-excel` is a regular **dependency**, not a peer: users install `react-data-export` only. The `version` export stays, kept in sync by `npm run version-packages`. `useVersion`, the scaffold placeholder, was removed when the dataset module landed (RDE-1.9).
 
 ## 3. The dataset shape
 
@@ -203,10 +203,12 @@ export function useExcelExport(defaults?: ExportOptions): UseExcelExport;
 
   ```tsx
   const { exportDataset } = useExcelExport();
-  useEffect(() => { void exportDataset(ds, { filename: 'report' }); }, []);
+  useEffect(() => {
+    exportDataset(ds, { filename: 'report' }).catch(() => {}); // aborted on unmount
+  }, [exportDataset]);
   ```
 
-  Browsers may block a download that doesn't follow a user gesture. The migration guide says so.
+  Under StrictMode in development, React's simulated unmount aborts the first run (the hook aborts on unmount) and the remount starts it again. That is why the recipe handles the rejection. Browsers may block a download that doesn't follow a user gesture. The migration guide says so.
 
 ## 6. `<ExcelExport>`
 
@@ -273,15 +275,15 @@ export function ExcelExport(props: ExcelExportProps): ReactElement;
 
 ## 9. Dependencies and order
 
-| needs | from javascript-excel | status today |
+| needs | from javascript-excel | available since |
 |---|---|---|
-| `Dataset`, `ColumnDef`, `DatasetOptions`, `fromDataset`, `fromDatasets` | core entry, its §4.3 | **2.0.0-alpha.2** (JSE-14, planned); not in 2.0.0-alpha.1 |
-| `toBlob`, `WriteOptions`, `Progress`, `DocProperties`, `isExcelError`, `sanitizeSheetName` | core entry, §5.1 / §4.6 / §7 | implemented (2.0.0-alpha.1) |
-| `toCsvBlob`, `CsvWriteOptions` | `javascript-excel/csv`, §5.3 | implemented (2.0.0-alpha.1) |
-| `download` | `javascript-excel/dom`, §5.4 | implemented (JSE-7); in 2.0.0-alpha.1 |
+| `Dataset`, `ColumnDef`, `DatasetOptions`, `fromDataset`, `fromDatasets` | core entry, its §4.3 | 2.0.0-alpha.2 (JSE-14) |
+| `toBlob`, `WriteOptions`, `Progress`, `DocProperties`, `isExcelError`, `sanitizeSheetName` | core entry, §5.1 / §4.6 / §7 | 2.0.0-alpha.1 |
+| `toCsvBlob`, `CsvWriteOptions` | `javascript-excel/csv`, §5.3 | 2.0.0-alpha.1 |
+| `download` | `javascript-excel/dom`, §5.4 | 2.0.0-alpha.1 (JSE-7) |
 | `WorkerClient` (1.x only) | `javascript-excel/worker`, §5.5 | planned (JSE-8) |
 
-So the RDE-1.9 code starts once **javascript-excel 2.0.0-alpha.2** is on npm. react-data-export then depends on `"javascript-excel": "^2.0.0-alpha.2"` ([Q6](#12-design-decisions)). Until then, only this design and its review happen. Writing a temporary `fromDataset` in React would duplicate the engine, which the principles rule out.
+So react-data-export depends on `"javascript-excel": "^2.0.0-alpha.2"` ([Q6](#12-design-decisions)), the first prerelease with `fromDataset`/`fromDatasets`. Nothing in react-data-export reimplements them.
 
 ## 10. Feature coverage
 

@@ -47,25 +47,29 @@ try {
 
   step('ESM import');
   console.log(run('node', ['--input-type=module', '-e', `
-    import { version, useVersion } from 'react-data-export';
+    import { version, exportDataset, exportWorkbook, useExcelExport, ExcelExport, isExcelError, sanitizeSheetName } from 'react-data-export';
     if (version !== ${JSON.stringify(pkg.version)}) throw new Error('bad version ' + version);
-    if (typeof useVersion !== 'function') throw new Error('useVersion missing');
-    const { isExcelError, sanitizeSheetName } = await import('react-data-export');
+    for (const f of [exportDataset, exportWorkbook, useExcelExport, ExcelExport]) if (typeof f !== 'function') throw new Error('missing export');
     if (sanitizeSheetName('a/b') !== 'a_b' || isExcelError(new Error('x')) !== false) throw new Error('javascript-excel re-exports broken');
-    console.log('esm ok', version);
+    const r = await exportDataset({ columns: [{ title: 'A', key: 'a' }], data: [{ a: 1 }] }, { download: false });
+    if (r.filename !== 'export.xlsx' || !(r.blob.size > 0)) throw new Error('exportDataset produced no file');
+    console.log('esm ok', version, r.filename, r.blob.size + ' bytes');
   `], app).trim());
 
   step('CJS require');
   console.log(run('node', ['-e', `
-    const { version, useVersion, isExcelError, sanitizeSheetName } = require('react-data-export');
+    const { version, exportDataset, exportWorkbook, useExcelExport, ExcelExport, isExcelError, sanitizeSheetName } = require('react-data-export');
     if (version !== ${JSON.stringify(pkg.version)}) throw new Error('bad version ' + version);
-    if (typeof useVersion !== 'function') throw new Error('useVersion missing');
+    for (const f of [exportDataset, exportWorkbook, useExcelExport, ExcelExport]) if (typeof f !== 'function') throw new Error('missing export');
     if (sanitizeSheetName('a/b') !== 'a_b' || isExcelError(new Error('x')) !== false) throw new Error('javascript-excel re-exports broken');
-    console.log('cjs ok', version);
+    exportWorkbook({ sheets: [{ columns: [{ title: 'A' }], data: [[1]] }] }, { format: 'csv', download: false }).then((r) => {
+      if (r.filename !== 'export.csv' || !(r.blob.size > 0)) throw new Error('exportWorkbook produced no file');
+      console.log('cjs ok', version, r.filename, r.blob.size + ' bytes');
+    }).catch((e) => { console.error(e); process.exit(1); });
   `], app).trim());
 
   step('types (node16 ESM + CJS, bundler)');
-  const src = `import { version, useVersion } from 'react-data-export';\nconst v: string = version;\nconst h: () => string = useVersion;\nexport { v, h };\n`;
+  const src = `import { version, exportDataset, type ExportResult } from 'react-data-export';\nconst v: string = version;\nconst p: Promise<ExportResult> = exportDataset({ data: [{ a: 1 }] }, { download: false });\nexport { v, p };\n`;
   writeFileSync(join(app, 'esm.mts'), src);
   writeFileSync(join(app, 'cjs.cts'), src);
   writeFileSync(join(app, 'bundler.ts'), src);
