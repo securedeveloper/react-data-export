@@ -19,7 +19,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [22, 24]
+        # Node 26 (LTS since 2026-10) is tested but not a required check yet.
+        node: [22, 24, 26]
         react: [17, 18, 19]
     env:
       # Asserted by the test suite, so a job can't silently run on the wrong React.
