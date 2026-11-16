@@ -1,4 +1,4 @@
-// Unit tests for release-check.mjs. Run with `node --test scripts/`.
+// Unit tests for release-check.mjs. Run with `node --test "scripts/*.test.mjs"`.
 // Shared verbatim across the four repositories, like release-check.mjs.
 
 import assert from "node:assert/strict";
@@ -6,8 +6,10 @@ import { describe, it } from "node:test";
 import {
   changelogSection,
   decide,
+  EVENTS,
   isPrerelease,
   npmVersionOk,
+  parseArgs,
   parseNpmView,
   parseVersion,
 } from "./release-check.mjs";
@@ -19,22 +21,22 @@ describe("decide", () => {
     {
       title: "changed and unpublished: release on latest",
       input: { version: "1.1.0", previousVersion: "1.0.0", publishedVersion: null },
-      expect: { release: true, distTag: "latest", prerelease: false, published: false, versionChanged: true },
+      expect: { release: true, distTag: "latest", prerelease: false, published: false, versionChanged: true, tag: true },
     },
     {
       title: "unchanged: skip",
       input: { version: "1.0.0", previousVersion: "1.0.0", publishedVersion: "1.0.0" },
-      expect: { release: false, distTag: "latest", published: true, versionChanged: false },
+      expect: { release: false, distTag: "latest", published: true, versionChanged: false, tag: false },
     },
     {
       title: "unchanged and unpublished (e.g. 2.0.0-alpha.0 never released): skip",
       input: { version: "2.0.0-alpha.0", previousVersion: "2.0.0-alpha.0", publishedVersion: null },
-      expect: { release: false, distTag: "next", published: false, versionChanged: false },
+      expect: { release: false, distTag: "next", published: false, versionChanged: false, tag: false },
     },
     {
       title: "changed but already on npm (re-run after publish): skip publish, still tag",
       input: { version: "1.1.0", previousVersion: "1.0.0", publishedVersion: "1.1.0" },
-      expect: { release: false, published: true, versionChanged: true },
+      expect: { release: false, published: true, versionChanged: true, tag: true },
     },
     {
       title: "prerelease: release on next",
@@ -54,7 +56,28 @@ describe("decide", () => {
     {
       title: "private package: never",
       input: { version: "1.1.0", previousVersion: "1.0.0", publishedVersion: null, isPrivate: true },
-      expect: { release: false, versionChanged: false },
+      expect: { release: false, versionChanged: false, tag: false },
+    },
+    // Manual runs (workflow_dispatch): the recovery path.
+    {
+      title: "manual, unchanged and unpublished (push release job failed before publish): release",
+      input: { version: "2.0.0-alpha.1", previousVersion: "2.0.0-alpha.1", publishedVersion: null, manual: true },
+      expect: { release: true, distTag: "next", prerelease: true, published: false, versionChanged: false, tag: true },
+    },
+    {
+      title: "manual, already on npm: skip publish, still (re)create a missing tag",
+      input: { version: "2.0.0-alpha.1", previousVersion: "2.0.0-alpha.1", publishedVersion: "2.0.0-alpha.1", manual: true },
+      expect: { release: false, published: true, versionChanged: false, tag: true },
+    },
+    {
+      title: "manual, changed and unpublished: release on latest",
+      input: { version: "1.1.0", previousVersion: "1.0.0", publishedVersion: null, manual: true },
+      expect: { release: true, distTag: "latest", versionChanged: true, tag: true },
+    },
+    {
+      title: "manual, private package: never",
+      input: { version: "1.1.0", previousVersion: "1.1.0", publishedVersion: null, isPrivate: true, manual: true },
+      expect: { release: false, tag: false },
     },
   ];
   for (const c of cases) {
@@ -67,6 +90,32 @@ describe("decide", () => {
 
   it("rejects a non-semver version", () => {
     assert.throws(() => decide({ name, version: "latest", previousVersion: null, publishedVersion: null }));
+  });
+
+  it("a push never releases an unchanged version, even when it is not on npm", () => {
+    const out = decide({ name, version: "2.0.0-alpha.1", previousVersion: "2.0.0-alpha.1", publishedVersion: null, manual: false });
+    assert.equal(out.release, false);
+    assert.equal(out.tag, false);
+  });
+});
+
+describe("parseArgs", () => {
+  it("defaults to the push event", () => {
+    assert.equal(parseArgs(["--package", "pkg"]).event, "push");
+  });
+
+  it("accepts every known event", () => {
+    for (const e of EVENTS) assert.equal(parseArgs(["--package", "pkg", "--event", e]).event, e);
+    assert.deepEqual(EVENTS, ["push", "pull_request", "workflow_dispatch"]);
+  });
+
+  it("rejects an unknown event (fail closed)", () => {
+    assert.throws(() => parseArgs(["--package", "pkg", "--event", "schedule"]), /--event must be one of/);
+    assert.throws(() => parseArgs(["--package", "pkg", "--event"]), /--event must be one of/);
+  });
+
+  it("rejects unknown arguments", () => {
+    assert.throws(() => parseArgs(["--package", "pkg", "--force"]), /unknown argument/);
   });
 });
 
