@@ -61,35 +61,57 @@ describe("decide", () => {
     // Manual runs (workflow_dispatch): the recovery path.
     {
       title: "manual, unchanged and unpublished (push release job failed before publish): release",
-      input: { version: "2.0.0-alpha.1", previousVersion: "2.0.0-alpha.1", publishedVersion: null, manual: true },
+      input: { version: "2.0.0-alpha.1", previousVersion: "2.0.0-alpha.1", publishedVersion: null, manual: true, changelogHasVersion: true },
       expect: { release: true, distTag: "next", prerelease: true, published: false, versionChanged: false, tag: true },
     },
     {
       title: "manual, already on npm: skip publish, still (re)create a missing tag",
-      input: { version: "2.0.0-alpha.1", previousVersion: "2.0.0-alpha.1", publishedVersion: "2.0.0-alpha.1", manual: true },
+      input: { version: "2.0.0-alpha.1", previousVersion: "2.0.0-alpha.1", publishedVersion: "2.0.0-alpha.1", manual: true, changelogHasVersion: true },
       expect: { release: false, published: true, versionChanged: false, tag: true },
     },
     {
       title: "manual, changed and unpublished: release on latest",
-      input: { version: "1.1.0", previousVersion: "1.0.0", publishedVersion: null, manual: true },
+      input: { version: "1.1.0", previousVersion: "1.0.0", publishedVersion: null, manual: true, changelogHasVersion: true },
       expect: { release: true, distTag: "latest", versionChanged: true, tag: true },
     },
     {
       title: "manual, private package: never",
       input: { version: "1.1.0", previousVersion: "1.1.0", publishedVersion: null, isPrivate: true, manual: true },
-      expect: { release: false, tag: false },
+      expect: { release: false, tag: false, refused: false },
+    },
+    {
+      title: "manual, no CHANGELOG section (e.g. a 1.0.0-alpha.0 scaffold, never cut): refused, nothing published or tagged",
+      input: { version: "1.0.0-alpha.0", previousVersion: "1.0.0-alpha.0", publishedVersion: null, manual: true, changelogHasVersion: false },
+      expect: { release: false, tag: false, refused: true, published: false },
+    },
+    {
+      title: "manual, already on npm but no CHANGELOG section (e.g. a 0.0.1 name reservation): refused",
+      input: { version: "0.0.1", previousVersion: "0.0.1", publishedVersion: "0.0.1", manual: true, changelogHasVersion: false },
+      expect: { release: false, tag: false, refused: true, published: true },
+    },
+    {
+      title: "push without a CHANGELOG section: unaffected, releases a changed unpublished version",
+      input: { version: "1.1.0", previousVersion: "1.0.0", publishedVersion: null, changelogHasVersion: false },
+      expect: { release: true, tag: true, refused: false },
     },
   ];
   for (const c of cases) {
     it(c.title, () => {
       const out = decide({ name, ...c.input });
       for (const [k, v] of Object.entries(c.expect)) assert.equal(out[k], v, k);
+      if (!("refused" in c.expect)) assert.equal(out.refused, false, "refused");
       assert.equal(typeof out.reason, "string");
     });
   }
 
   it("rejects a non-semver version", () => {
     assert.throws(() => decide({ name, version: "latest", previousVersion: null, publishedVersion: null }));
+  });
+
+  it("a refused manual run explains itself", () => {
+    const out = decide({ name, version: "1.0.0-alpha.0", previousVersion: "1.0.0-alpha.0", publishedVersion: null, manual: true, changelogHasVersion: false });
+    assert.match(out.reason, /^manual run refused: CHANGELOG\.md has no "## 1\.0\.0-alpha\.0" section/);
+    assert.match(out.reason, /npm run version-packages/);
   });
 
   it("a push never releases an unchanged version, even when it is not on npm", () => {

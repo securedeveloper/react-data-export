@@ -82,7 +82,7 @@ gh workflow run release.yml --ref main
 
 (or Actions → Release → Run workflow, branch `main`.)
 
-A manual run publishes the current version of `main` **if it is not on npm yet**, even when it did not change in the last commit. If it is already on npm, nothing is published, and the run only creates the `v<version>` tag and GitHub Release if they are missing. npm errors other than "not found" still fail the job, as on a push. The run is limited to `main`, both by the job's `if` and by the `npm` environment's branch policy.
+A manual run publishes the current version of `main` **if it is not on npm yet**, even when it did not change in the last commit. It also requires that version to have a `## <version>` section in the package `CHANGELOG.md`, that is, a version cut by `npm run version-packages`. Without one, the run fails with "manual run refused: CHANGELOG.md has no \"## <version>\" section …" and publishes and tags nothing, so a scaffold or hand-edited version can't be published by hand. If it is already on npm, nothing is published, and the run only creates the `v<version>` tag and GitHub Release if they are missing. npm errors other than "not found" still fail the job, as on a push. The run is limited to `main`, both by the job's `if` and by the `npm` environment's branch policy.
 
 Trusted publishing checks the **workflow file name** (`release.yml`) and the environment (`npm`), not the event that started it. A manual run is the same file in the same environment, so it publishes exactly like a push. The tag and Release point at the commit that was built: the tip of `main` when the run started.
 

@@ -10,6 +10,10 @@
 // A manual run (`--event workflow_dispatch`, the recovery path) skips (a): it
 // releases whenever name@version is not on npm yet, for example after a push
 // whose release job failed before publishing. npm errors still fail closed.
+// A manual run also requires a `## <version>` section in <package
+// dir>/CHANGELOG.md, i.e. a version cut by `npm run version-packages`;
+// otherwise it fails (exit 1) and publishes and tags nothing, so a scaffold
+// or hand-edited version can't be published by hand.
 //
 // Usage (in CI):
 //   node scripts/release-check.mjs --package <dir> [--event <push|pull_request|workflow_dispatch>] [--notes-out <file>]
@@ -68,8 +72,9 @@ export function npmVersionOk(version, min = MIN_NPM) {
  * @param {string|null} input.publishedVersion `npm view name@version version` (null: not on npm)
  * @param {boolean} [input.isPrivate]     package.json "private"
  * @param {boolean} [input.manual]        workflow_dispatch: release whenever not on npm, even if unchanged
+ * @param {boolean} [input.changelogHasVersion] the package CHANGELOG.md has a `## <version>` section (required for manual runs)
  */
-export function decide({ name, version, previousVersion, publishedVersion, isPrivate = false, manual = false }) {
+export function decide({ name, version, previousVersion, publishedVersion, isPrivate = false, manual = false, changelogHasVersion = true }) {
   parseVersion(version);
   const distTag = isPrerelease(version) ? "next" : "latest";
   const base = {
@@ -83,9 +88,22 @@ export function decide({ name, version, previousVersion, publishedVersion, isPri
     versionChanged: previousVersion !== version,
     // A manual run may also (re)create a missing tag/Release for the current version.
     tag: previousVersion !== version || manual,
+    // A manual run that must not act at all; the CLI exits non-zero.
+    refused: false,
   };
   if (isPrivate) return { ...base, versionChanged: false, tag: false, release: false, reason: `${name} is private` };
   if (manual) {
+    if (!changelogHasVersion) {
+      return {
+        ...base,
+        release: false,
+        tag: false,
+        refused: true,
+        reason:
+          `manual run refused: CHANGELOG.md has no "## ${version}" section, so ${version} was not cut by ` +
+          "`npm run version-packages`; nothing is published or tagged",
+      };
+    }
     if (publishedVersion) {
       return { ...base, release: false, reason: `manual run: ${name}@${version} is already on npm` };
     }
@@ -180,6 +198,9 @@ function main() {
   const view = sh("npm", ["view", `${pkg.name}@${pkg.version}`, "version", "--json"]);
   const publishedVersion = parseNpmView(view);
 
+  const changelog = join(args.package, "CHANGELOG.md");
+  const section = existsSync(changelog) ? changelogSection(readFileSync(changelog, "utf8"), pkg.version) : null;
+
   const result = decide({
     name: pkg.name,
     version: pkg.version,
@@ -187,16 +208,13 @@ function main() {
     publishedVersion,
     isPrivate: pkg.private === true,
     manual: args.event === "workflow_dispatch",
+    changelogHasVersion: section !== null,
   });
 
   console.log(`npm ${npmVersion}; ${pkg.name}: HEAD ${pkg.version}, HEAD~1 ${previousVersion ?? "(none)"}, npm ${publishedVersion ?? "(not published)"}`);
   console.log(`${result.release ? "release" : "no release"}: ${result.reason}`);
 
   if (result.tag && args.notesOut) {
-    const changelog = join(args.package, "CHANGELOG.md");
-    const section = existsSync(changelog)
-      ? changelogSection(readFileSync(changelog, "utf8"), pkg.version)
-      : null;
     writeFileSync(args.notesOut, `${section ?? `Release ${pkg.version}.`}\n`);
     if (!section) console.log(`note: no CHANGELOG.md section for ${pkg.version}; using a one-line note`);
   }
@@ -223,6 +241,8 @@ function main() {
       `**${result.release ? "Release" : "No release"}** of \`${result.name}@${result.version}\`: ${result.reason}\n`,
     );
   }
+  // Outputs and summary are written first, so the refusal is visible on the run page.
+  if (result.refused) throw new Error(result.reason);
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
