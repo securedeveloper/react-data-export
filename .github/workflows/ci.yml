@@ -70,6 +70,12 @@ jobs:
       - name: Build library
         run: npm run build -w react-data-export
 
+      # OPS-11: react-data-export depends on javascript-excel only (peer: react),
+      # and only dist/ + README + LICENSE + package.json are published. A new
+      # runtime dependency means changing this allowlist in the same pull request.
+      - name: Dependency guard (runtime allowlist, tarball contents)
+        run: node scripts/check-deps.mjs --package packages/react-data-export --allow javascript-excel --peer react --pack
+
       - name: Lint package (publint + are-the-types-wrong)
         if: matrix.react == 19
         run: npm run lint:pkg
