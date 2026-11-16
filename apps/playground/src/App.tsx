@@ -1,6 +1,7 @@
-import { useId, useMemo, useState, type ReactElement } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type ReactElement } from "react";
 import { fromDataset, type Sheet } from "javascript-excel";
-import { ExcelExport, isExcelError, useExcelExport, version, type ExcelWarning } from "react-data-export";
+import { fromTable } from "javascript-excel/dom";
+import { ExcelExport, ExportTableButton, isExcelError, useExcelExport, useTableExport, version, type ExcelWarning } from "react-data-export";
 import { DEFAULT_OPTIONS, exportOptions, parseDataset, sheetOptions, type EditorOptions } from "./options";
 import { previewOf, type Preview } from "./preview";
 import { SAMPLE_DATASET } from "./sample";
@@ -192,11 +193,124 @@ function DatasetTab(): ReactElement {
 }
 
 function TableTab(): ReactElement {
+  const ref = useRef<HTMLTableElement>(null);
+  const [styles, setStyles] = useState(true);
+  const [format, setFormat] = useState<EditorOptions["format"]>("xlsx");
+  const [preview, setPreview] = useState<{ grid?: Preview; error?: string }>({});
+  const hook = useTableExport(ref, { filename: "orders", name: "Orders", freezeHeader: true, autoWidth: true });
+  const formatId = useId();
+  const options = { filename: "orders", format, styles: styles ? ("computed" as const) : ("none" as const), freezeHeader: true, autoWidth: true, name: "Orders" };
+
+  // Preview the sheet fromTable builds from the rendered <table> (the same call the export makes).
+  useEffect(() => {
+    if (!ref.current) return;
+    try {
+      setPreview({ grid: previewOf(fromTable(ref.current, { styles: options.styles, freezeHeader: true })) });
+    } catch (e) {
+      setPreview({ error: describe(e) });
+    }
+  }, [styles]);
+
   return (
-    <div>
+    <div className="table-tab">
       <p>
-        Exporting an HTML <code>&lt;table&gt;</code> (<code>exportTable</code>, <code>useTableExport</code>, <code>&lt;ExportTableButton&gt;</code>) comes with the table module, which is still in progress. This tab will show it once it is released.
+        An ordinary HTML table, exported as it is rendered: <code>colspan</code>/<code>rowspan</code> become merges, <code>data-type</code> and <code>data-numfmt</code> give types and number formats, rows marked <code>data-export-ignore</code> are skipped, links are kept, and with <em>computed styles</em> the page's bold, colours and alignment come along.
       </p>
+      <div className="sheet-scroll" role="region" aria-label="The HTML table to export" tabIndex={0}>
+        <table ref={ref} className="demo">
+          <caption>Orders (the table on the page)</caption>
+          <thead>
+            <tr>
+              <th rowSpan={2}>Order</th>
+              <th rowSpan={2}>Customer</th>
+              <th colSpan={2}>Amount</th>
+            </tr>
+            <tr>
+              <th>Net</th>
+              <th>Shipped</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">1001</th>
+              <td>
+                <a href="https://example.com/customers/ada">Ada</a>
+              </td>
+              <td data-type="number" data-value="1250.5" data-numfmt="#,##0.00">
+                1,250.50
+              </td>
+              <td data-type="date" data-value="2024-01-15">
+                15 Jan 2024
+              </td>
+            </tr>
+            <tr data-export-ignore="">
+              <th scope="row">draft</th>
+              <td colSpan={3}>Not exported (data-export-ignore)</td>
+            </tr>
+            <tr>
+              <th scope="row">1002</th>
+              <td>Grace</td>
+              <td data-type="number" data-value="980" data-numfmt="#,##0.00">
+                980.00
+              </td>
+              <td data-type="date" data-value="2024-01-16">
+                16 Jan 2024
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <th scope="row" colSpan={2}>
+                Total
+              </th>
+              <td data-type="number" data-value="2230.5" data-numfmt="#,##0.00">
+                2,230.50
+              </td>
+              <td />
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <fieldset className="options">
+        <legend>Export options</legend>
+        <div className="field">
+          <label htmlFor={formatId}>Format</label>
+          <select id={formatId} value={format} onChange={(e) => setFormat(e.target.value as EditorOptions["format"])}>
+            <option value="xlsx">.xlsx</option>
+            <option value="csv">.csv</option>
+          </select>
+        </div>
+        <Check label="Computed styles (bold, colours, alignment)" checked={styles} onChange={setStyles} />
+      </fieldset>
+      <div className="actions">
+        {/* The component: give it the ref, it renders the button. */}
+        <ExportTableButton tableRef={ref} {...options} onError={() => undefined}>
+          {({ run, status }) => (
+            <button type="button" disabled={status === "exporting"} onClick={() => void run()}>
+              Download with &lt;ExportTableButton&gt;
+            </button>
+          )}
+        </ExportTableButton>
+        {/* The hook: the same export in your own UI; the ref is read when it runs. */}
+        <button type="button" disabled={hook.status === "exporting"} onClick={() => void hook.exportTable(options).catch(() => undefined)}>
+          Download with useTableExport
+        </button>
+      </div>
+      <p className="status" role="status">
+        {hook.status === "exporting"
+          ? "Exporting…"
+          : hook.status === "done" && hook.result
+            ? `Saved ${hook.result.filename} (${hook.result.blob.size.toLocaleString("en-US")} bytes).`
+            : hook.status === "error"
+              ? `Export failed: ${describe(hook.error)}`
+              : ""}
+      </p>
+      {preview.error ? (
+        <p className="status error" role="alert">
+          {preview.error}
+        </p>
+      ) : null}
+      {preview.grid ? <PreviewTable preview={preview.grid} /> : null}
     </div>
   );
 }
@@ -217,7 +331,7 @@ export function App(): ReactElement {
       <main>
         <header>
           <h1>react-data-export playground</h1>
-          <p className="lead">Edit a dataset, pick export options, see the sheet, and download it as .xlsx or .csv with the real library.</p>
+          <p className="lead">Export a dataset or an HTML table as .xlsx or .csv with the real library: edit, pick options, preview, download.</p>
         </header>
         <div className="tablist" role="tablist" aria-label="Playground sections">
           {TABS.map((t, i) => (

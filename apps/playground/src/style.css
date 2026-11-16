@@ -210,3 +210,14 @@ table.sheet tr.frozen td { font-weight: 600; }
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
 }
+
+/* Table tab: the source <table> styled like an app table, so computed styles have something to carry. */
+.table-tab { display: grid; gap: 1rem; }
+.table-tab .actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+table.demo { border-collapse: collapse; }
+table.demo caption { text-align: left; font-weight: 600; padding-bottom: 0.25rem; }
+table.demo th, table.demo td { border: 1px solid var(--border); padding: 0.25rem 0.5rem; }
+table.demo thead th { background: #ddebf7; color: #1f2937; font-weight: 700; text-align: center; }
+table.demo td[data-type="number"] { text-align: right; }
+table.demo tfoot th, table.demo tfoot td { font-weight: 700; }
+table.demo tr[data-export-ignore] { color: var(--muted); font-style: italic; }
