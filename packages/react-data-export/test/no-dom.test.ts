@@ -21,3 +21,7 @@ it('download: false returns the file', async () => {
   const result = await rde.exportDataset(ds, { download: false });
   expect(result.blob.size).toBeGreaterThan(0);
 });
+
+it('exportTable without a table (no DOM) rejects with a TypeError', async () => {
+  await expect(rde.exportTable({ current: null })).rejects.toThrow(TypeError);
+});

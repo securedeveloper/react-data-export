@@ -5,7 +5,7 @@ Export data from React to `.xlsx` and `.csv`.
 ## Status: 1.0 is a from-scratch rewrite, in progress
 
 - **1.0 is a clean break.** It is being rebuilt on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0 and will not ship the 0.x `<ExcelFile>` / `<ExcelSheet>` / `<ExcelColumn>` API. See [Migrating from 0.x](#migrating-from-0x).
-- **The dataset module is on `main`, not yet on npm:** `exportDataset`, `exportWorkbook`, `useExcelExport` and `<ExcelExport>`, as specified in [docs/api.md](docs/api.md). They are built on javascript-excel 2.0's `fromDataset`, writer and download. Table export comes later, and the first 1.0 prerelease will be announced in this README.
+- **Dataset and table export are on `main`, not yet on npm:** `exportDataset`, `exportWorkbook`, `useExcelExport` and `<ExcelExport>`, plus `exportTable`, `useTableExport` and `<ExportTableButton>` for an HTML `<table>`, as specified in [docs/api.md](docs/api.md). They are built on javascript-excel 2.0's `fromDataset`, `fromTable`, writer and download. The first 1.0 prerelease will be announced in this README.
 
   ```tsx
   import { ExcelExport } from 'react-data-export';

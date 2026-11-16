@@ -1,8 +1,8 @@
 # react-data-export 1.0: API design (dataset module)
 
-Status: **design decided (2026-11-16); the dataset module is implemented** (RDE-1.9) on **javascript-excel ≥ 2.0.0-alpha.2** (see [§9](#9-dependencies-and-order)). It is not published yet. Table export (module B) comes later.
+Status: **design decided (2026-11-16); the dataset module is implemented** (RDE-1.9) on **javascript-excel ≥ 2.0.0-alpha.2** (see [§9](#9-dependencies-and-order)). It is not published yet. Table export (module B, [§13](#13-table-export)) is designed and implemented in RDE-1.17.
 
-This document covers module A, **dataset export**: `exportDataset`, `exportWorkbook`, `useExcelExport` and `<ExcelExport>`. Module B, table export (`exportTable`, `useTableExport`, `<ExportTableButton>`), gets its own section in a later change (RDE-1.17).
+This document covers module A, **dataset export** (`exportDataset`, `exportWorkbook`, `useExcelExport`, `<ExcelExport>`), and module B, **table export** (`exportTable`, `useTableExport`, `<ExportTableButton>`, [§13](#13-table-export)).
 
 ## Contents
 
@@ -18,6 +18,7 @@ This document covers module A, **dataset export**: `exportDataset`, `exportWorkb
 10. [Feature coverage](#10-feature-coverage)
 11. [From 0.x](#11-from-0x)
 12. [Design decisions](#12-design-decisions)
+13. [Table export](#13-table-export)
 
 ---
 
@@ -42,10 +43,13 @@ One entry, `react-data-export`, ESM + CJS + `.d.ts`, `sideEffects: false`. It ex
 | `exportDataset`, `exportWorkbook` | functions | §4 |
 | `useExcelExport` | hook | §5 |
 | `ExcelExport` | component | §6 |
+| `exportTable`, `useTableExport`, `ExportTableButton` | function, hook, component | §13 |
 | `isExcelError`, `sanitizeSheetName` | re-exports from `javascript-excel` | §7, §4.2 |
 | `version` | `string` | |
 | types: `Dataset`, `ColumnDef`, `LeafColumn`, `GroupColumn`, `DatasetOptions`, `Style`, `CellInput`, `CsvWriteOptions`, `WriteOptions`, `Progress`, `ExcelWarning` | type re-exports from `javascript-excel` (and `javascript-excel/csv`) | §3 |
 | types: `ExportOptions`, `ExportFormat`, `ExportResult`, `WorkbookSpec`, `SheetSpec`, `ExportStatus`, `UseExcelExport`, `ExcelExportProps` | react-data-export's own | §4–§6 |
+| types: `FromTableOptions`, `TableElement`, `TableCellElement` | type re-exports from `javascript-excel/dom` | §13 |
+| types: `TableRef`, `TableTarget`, `UseTableExport`, `ExportTableButtonProps` | react-data-export's own | §13 |
 
 `javascript-excel` is a regular **dependency**, not a peer: users install `react-data-export` only. The `version` export stays, kept in sync by `npm run version-packages`. `useVersion`, the scaffold placeholder, was removed when the dataset module landed (RDE-1.9).
 
@@ -281,6 +285,7 @@ export function ExcelExport(props: ExcelExportProps): ReactElement;
 | `toBlob`, `WriteOptions`, `Progress`, `DocProperties`, `isExcelError`, `sanitizeSheetName` | core entry, §5.1 / §4.6 / §7 | 2.0.0-alpha.1 |
 | `toCsvBlob`, `CsvWriteOptions` | `javascript-excel/csv`, §5.3 | 2.0.0-alpha.1 |
 | `download` | `javascript-excel/dom`, §5.4 | 2.0.0-alpha.1 (JSE-7) |
+| `fromTable`, `FromTableOptions`, `TableElement` (§13) | `javascript-excel/dom`, §5.4 | 2.0.0-alpha.1 (JSE-7) |
 | `WorkerClient` (1.x only) | `javascript-excel/worker`, §5.5 | planned (JSE-8) |
 
 So react-data-export depends on `"javascript-excel": "^2.0.0-alpha.2"` ([Q6](#12-design-decisions)), the first prerelease with `fromDataset`/`fromDatasets`. Nothing in react-data-export reimplements them.
@@ -302,6 +307,7 @@ The 1.0 feature list, and where each one comes from:
 | CSV options: delimiter, BOM, injection guard (#138) | `format: 'csv'` + `csv` (`CsvWriteOptions`); the injection guard is on by default |
 | Big data: progress, `AbortSignal` (#154 #170 #153) | `onProgress`, `signal`, hook `abort()`; worker in 1.x (§7) |
 | SSR-safe, no `window` at import (#168 family) | §8 |
+| Export an HTML table (#172) | `exportTable`, `useTableExport`, `<ExportTableButton>` over `fromTable` (§13) |
 
 ## 11. From 0.x
 
@@ -335,3 +341,60 @@ These were the open questions of the review. Each one is decided, and the sectio
 **Q6. javascript-excel range during the 2.0 prereleases.** Decided (2026-11-16): `"javascript-excel": "^2.0.0-alpha.2"` (§9). A caret on a prerelease matches only later 2.0.0 prereleases and 2.0.0 itself. An exact pin bumped with each alpha was not taken.
 
 **Q7. Accessor fields.** Decided (2026-11-16): javascript-excel's `key` / `path` / `value` / `index` pass through unchanged (§3). That gives one documented shape for every framework and no ambiguity about `'a.b'`. A combined react-data-export field mapped to `key` or `path`, which javascript-excel's Q18 would allow, was not taken.
+
+## 13. Table export
+
+Module B exports an HTML `<table>` that is already on the page. It is the same thin layer as module A. `fromTable` from `javascript-excel/dom` reads the table, `toBlob` or `toCsvBlob` writes it, and `download` saves it. Reading tables (structure, merges, hints, hidden rows, links, styles) is javascript-excel's job (its §5.4), so it isn't repeated here.
+
+### 13.1 Signatures
+
+```ts
+import type { FromTableOptions, TableElement } from 'javascript-excel/dom';
+
+/** Anything with a `current` table, e.g. the object from useRef<HTMLTableElement>(null). */
+export interface TableRef { readonly current: TableElement | null }
+export type TableTarget = TableElement | TableRef;
+
+export function exportTable(table: TableTarget, options?: ExportOptions & FromTableOptions): Promise<ExportResult>;
+
+export interface UseTableExport {
+  /** Exports the table the ref points to when it is called. */
+  exportTable(options?: ExportOptions & FromTableOptions): Promise<ExportResult>;
+  status: ExportStatus;
+  progress: Progress | null;
+  error: unknown;
+  result: ExportResult | null;
+  abort(reason?: unknown): void;
+}
+export function useTableExport(ref: TableRef, defaults?: ExportOptions & FromTableOptions): UseTableExport;
+
+export type ExportTableButtonProps = ExportOptions & FromTableOptions & {
+  tableRef: TableRef;
+  onExported?: (result: ExportResult) => void;
+  onError?: (error: unknown) => void;
+  children?: ReactNode | ((api: { run(): Promise<ExportResult | undefined>; status: ExportStatus; progress: Progress | null }) => ReactNode);
+};
+export function ExportTableButton(props: ExportTableButtonProps): ReactElement;
+```
+
+```tsx
+const ref = useRef<HTMLTableElement>(null);
+<table ref={ref}>…</table>
+<ExportTableButton tableRef={ref} filename="orders" freezeHeader autoWidth>Export orders</ExportTableButton>
+```
+
+### 13.2 Behaviour
+
+- **Options pass through unchanged.** Everything that isn't an `ExportOptions` key goes to `fromTable` as it is: `name`, `header`, `headerStyle`, `includeFooter`, `skipHidden`, `ignore`, `styles`, `inferTypes`, `links`, `hyperlinkSchemes`, `freezeHeader`, `autoFilter`, `autoWidth`, `cell` and `onWarning`. The defaults are javascript-excel's: `<thead>` rows are bold headers, `colspan`/`rowspan` become merges, hidden and `[data-export-ignore]` rows and cells are skipped, and `data-type`/`data-value`/`data-numfmt` hints are honoured. A new `fromTable` option works without a react-data-export release, since the types are re-exported.
+- **The result shape is shared** with `exportDataset`: `{ blob, filename, format, warnings }`. `warnings` collects `fromTable`'s warnings (`COERCION_FAILED`, `HYPERLINK_DROPPED`), which also still reach `onWarning`. Filename, format, `download`, `write`, `csv`, `properties`, `signal` and `onProgress` behave as in §4.2. CSV keeps the values and drops merges and styles, as `toCsvBlob` does.
+- **Refs.**
+  - `exportTable` accepts the element or a ref, and reads `ref.current` when it is called.
+  - The hook and the component take a ref, which is read when the export starts, never at render. That's when the table is guaranteed to be mounted, and it always exports the table's current contents.
+  - `TableRef` is structural (`{ readonly current }`), so `useRef<HTMLTableElement>(null)` from @types/react 17, 18 and 19 fits without depending on any of them.
+  - **Callback refs are not supported.** Use an object ref.
+  - **An empty ref** (`current` is `null`: not rendered yet, or unmounted) rejects with a `TypeError` before anything is built.
+- **Order of checks:** the format, then the signal, then the element, then build, write, the signal again, and the download.
+- **SSR.** Importing stays side-effect free. On the server there's no table, so a table export can only start in the browser. Exporting from a server render is not a use case: the table is in the user's DOM.
+- **Hook and component:** these are `useExcelExport` and `<ExcelExport>` with a ref instead of data. They share the same state, abort and unmount behaviour (§5) and the same trigger and `run()` contract (§6), through one internal implementation, so the two can't drift. Unlike `<ExcelExport>`, `<ExportTableButton>` always has its single target, `tableRef`, so there's no "exactly one of" check.
+- **Errors** are javascript-excel's, unchanged (§7), for example `INVALID_SHEET_NAME` for a bad `name`.
+

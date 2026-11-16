@@ -47,9 +47,11 @@ try {
 
   step('ESM import');
   console.log(run('node', ['--input-type=module', '-e', `
-    import { version, exportDataset, exportWorkbook, useExcelExport, ExcelExport, isExcelError, sanitizeSheetName } from 'react-data-export';
+    import { version, exportDataset, exportWorkbook, useExcelExport, ExcelExport, exportTable, useTableExport, ExportTableButton, isExcelError, sanitizeSheetName } from 'react-data-export';
     if (version !== ${JSON.stringify(pkg.version)}) throw new Error('bad version ' + version);
-    for (const f of [exportDataset, exportWorkbook, useExcelExport, ExcelExport]) if (typeof f !== 'function') throw new Error('missing export');
+    for (const f of [exportDataset, exportWorkbook, useExcelExport, ExcelExport, exportTable, useTableExport, ExportTableButton]) if (typeof f !== 'function') throw new Error('missing export');
+    const noTable = await exportTable({ current: null }).then(() => null, (e) => e);
+    if (!(noTable instanceof TypeError)) throw new Error('exportTable without a table should reject with a TypeError');
     if (sanitizeSheetName('a/b') !== 'a_b' || isExcelError(new Error('x')) !== false) throw new Error('javascript-excel re-exports broken');
     const r = await exportDataset({ columns: [{ title: 'A', key: 'a' }], data: [{ a: 1 }] }, { download: false });
     if (r.filename !== 'export.xlsx' || !(r.blob.size > 0)) throw new Error('exportDataset produced no file');
@@ -58,9 +60,9 @@ try {
 
   step('CJS require');
   console.log(run('node', ['-e', `
-    const { version, exportDataset, exportWorkbook, useExcelExport, ExcelExport, isExcelError, sanitizeSheetName } = require('react-data-export');
+    const { version, exportDataset, exportWorkbook, useExcelExport, ExcelExport, exportTable, useTableExport, ExportTableButton, isExcelError, sanitizeSheetName } = require('react-data-export');
     if (version !== ${JSON.stringify(pkg.version)}) throw new Error('bad version ' + version);
-    for (const f of [exportDataset, exportWorkbook, useExcelExport, ExcelExport]) if (typeof f !== 'function') throw new Error('missing export');
+    for (const f of [exportDataset, exportWorkbook, useExcelExport, ExcelExport, exportTable, useTableExport, ExportTableButton]) if (typeof f !== 'function') throw new Error('missing export');
     if (sanitizeSheetName('a/b') !== 'a_b' || isExcelError(new Error('x')) !== false) throw new Error('javascript-excel re-exports broken');
     exportWorkbook({ sheets: [{ columns: [{ title: 'A' }], data: [[1]] }] }, { format: 'csv', download: false }).then((r) => {
       if (r.filename !== 'export.csv' || !(r.blob.size > 0)) throw new Error('exportWorkbook produced no file');
