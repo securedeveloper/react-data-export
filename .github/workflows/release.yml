@@ -5,11 +5,18 @@
 # authenticates this exact file name, so it must stay `release.yml`, must not
 # be called through workflow_call, and needs no NPM_TOKEN. Provenance is
 # attached automatically. See RELEASING.md.
+#
+# workflow_dispatch is the recovery path: a manual run on main publishes the
+# current version if it is not on npm yet, even when it did not change in the
+# last commit (for example after a push whose release job failed before
+# publishing). Dispatching runs this same file, which is what trusted
+# publishing checks.
 name: Release
 
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: write # git tag + GitHub Release
@@ -25,6 +32,9 @@ env:
 jobs:
   release:
     name: Release
+    # The npm environment is limited to main as well; this keeps a dispatch
+    # from another branch from even starting.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: npm
     steps:
@@ -39,11 +49,20 @@ jobs:
 
       - name: Detect release
         id: check
-        run: node scripts/release-check.mjs --package "$PACKAGE_DIR" --notes-out "$RUNNER_TEMP/release-notes.md"
+        run: node scripts/release-check.mjs --package "$PACKAGE_DIR" --event "${{ github.event_name }}" --notes-out "$RUNNER_TEMP/release-notes.md"
 
       - name: Install
         if: steps.check.outputs.release == 'true'
         run: npm ci
+
+      # Same as ci.yml: test suites that compare against openpyxl require it
+      # when CI is set. Harmless where no test uses it.
+      - name: Python tools (openpyxl)
+        if: steps.check.outputs.release == 'true'
+        run: |
+          python3 -m venv "$RUNNER_TEMP/py"
+          "$RUNNER_TEMP/py/bin/pip" install --quiet openpyxl==3.1.5
+          echo "JSE_PYTHON=$RUNNER_TEMP/py/bin/python" >> "$GITHUB_ENV"
 
       - name: Verify (typecheck, test, build)
         if: steps.check.outputs.release == 'true'
@@ -56,11 +75,12 @@ jobs:
         if: steps.check.outputs.release == 'true'
         run: npm publish "./$PACKAGE_DIR" --tag "${{ steps.check.outputs.dist-tag }}"
 
-      # Runs whenever the version changed, not only when this run published:
-      # a re-run after a successful publish but a failed `gh release create`
-      # then still creates the tag and Release. Already there: no-op.
+      # Runs whenever the version changed (or on a manual run), not only when
+      # this run published: a re-run after a successful publish but a failed
+      # `gh release create` then still creates the tag and Release. Already
+      # there: no-op.
       - name: Tag and GitHub Release
-        if: steps.check.outputs.version-changed == 'true'
+        if: steps.check.outputs.tag == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.check.outputs.version }}

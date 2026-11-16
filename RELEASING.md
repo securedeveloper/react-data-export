@@ -61,7 +61,7 @@ On every push to `main`, the `Release` job (environment `npm`, `main` only) runs
 Otherwise it stops with "no release" in the job summary. That covers docs and feature merges, re-runs after a successful publish, and the current `1.0.0-alpha.0` (never published, and the version hasn't changed).
 
 For a release, the job then:
-1. runs `npm ci`, `npm run typecheck`, `npm test` and `npm run build`,
+1. runs `npm ci`, sets up openpyxl (part of the shared `release.yml`; this package's tests don't need it, but the step is kept so the file stays identical across the four repositories), then `npm run typecheck`, `npm test` and `npm run build`,
 2. runs `npm publish ./packages/react-data-export --tag next|latest`,
 3. runs `gh release create v<version>`, which creates the tag on the merge commit. The notes are that version's section of `CHANGELOG.md`.
 
@@ -71,6 +71,20 @@ Re-running the job is safe:
 - After a failed publish, the version is still unpublished, so the re-run publishes.
 - After a successful publish but a failed tag/Release step, the re-run skips publishing and creates the missing tag and Release.
 - If everything already succeeded, the re-run does nothing.
+
+### Recovery: run the release by hand
+
+A re-run repeats the original push, so it can't help when the version is no longer "new" relative to `HEAD~1`. For example, the release job failed before publishing, and a fix for the job itself was merged afterwards. For that case, `release.yml` can also be started manually:
+
+```sh
+gh workflow run release.yml --ref main
+```
+
+(or Actions → Release → Run workflow, branch `main`.)
+
+A manual run publishes the current version of `main` **if it is not on npm yet**, even when it did not change in the last commit. If it is already on npm, nothing is published, and the run only creates the `v<version>` tag and GitHub Release if they are missing. npm errors other than "not found" still fail the job, as on a push. The run is limited to `main`, both by the job's `if` and by the `npm` environment's branch policy.
+
+Trusted publishing checks the **workflow file name** (`release.yml`) and the environment (`npm`), not the event that started it. A manual run is the same file in the same environment, so it publishes exactly like a push. The tag and Release point at the commit that was built: the tip of `main` when the run started.
 
 ## 5. First release: one-time setup (Afzal)
 

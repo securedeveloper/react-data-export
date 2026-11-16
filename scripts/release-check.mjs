@@ -7,14 +7,19 @@
 // Everything else (docs, CI, feature PRs without a version bump, re-runs after
 // a publish) exits 0 with release=false.
 //
+// A manual run (`--event workflow_dispatch`, the recovery path) skips (a): it
+// releases whenever name@version is not on npm yet, for example after a push
+// whose release job failed before publishing. npm errors still fail closed.
+//
 // Usage (in CI):
-//   node scripts/release-check.mjs --package <dir> [--notes-out <file>]
+//   node scripts/release-check.mjs --package <dir> [--event <push|pull_request|workflow_dispatch>] [--notes-out <file>]
 //
 // Writes `release`, `name`, `version`, `dist-tag`, `prerelease`, `published`
-// (name@version already on npm) and `version-changed` (differs from HEAD~1)
-// to $GITHUB_OUTPUT, a one-line verdict to $GITHUB_STEP_SUMMARY and, when the
-// version changed, the release notes to --notes-out: that version's section
-// of <package dir>/CHANGELOG.md, or a one-line fallback.
+// (name@version already on npm), `version-changed` (differs from HEAD~1) and
+// `tag` (run the idempotent tag + GitHub Release step: version changed, or a
+// manual run) to $GITHUB_OUTPUT, a one-line verdict to $GITHUB_STEP_SUMMARY
+// and, when `tag` is true, the release notes to --notes-out: that version's
+// section of <package dir>/CHANGELOG.md, or a one-line fallback.
 //
 // Node built-ins only. This file is shared verbatim by the javascript-excel,
 // react-data-export, react-data-import and react-xlsx-viewer repositories;
@@ -62,8 +67,9 @@ export function npmVersionOk(version, min = MIN_NPM) {
  * @param {string|null} input.previousVersion  version at HEAD~1 (null: file or commit missing)
  * @param {string|null} input.publishedVersion `npm view name@version version` (null: not on npm)
  * @param {boolean} [input.isPrivate]     package.json "private"
+ * @param {boolean} [input.manual]        workflow_dispatch: release whenever not on npm, even if unchanged
  */
-export function decide({ name, version, previousVersion, publishedVersion, isPrivate = false }) {
+export function decide({ name, version, previousVersion, publishedVersion, isPrivate = false, manual = false }) {
   parseVersion(version);
   const distTag = isPrerelease(version) ? "next" : "latest";
   const base = {
@@ -75,8 +81,16 @@ export function decide({ name, version, previousVersion, publishedVersion, isPri
     // Drives the (idempotent) tag + GitHub Release step, so a re-run after a
     // successful publish but a failed `gh release create` still tags it.
     versionChanged: previousVersion !== version,
+    // A manual run may also (re)create a missing tag/Release for the current version.
+    tag: previousVersion !== version || manual,
   };
-  if (isPrivate) return { ...base, versionChanged: false, release: false, reason: `${name} is private` };
+  if (isPrivate) return { ...base, versionChanged: false, tag: false, release: false, reason: `${name} is private` };
+  if (manual) {
+    if (publishedVersion) {
+      return { ...base, release: false, reason: `manual run: ${name}@${version} is already on npm` };
+    }
+    return { ...base, release: true, reason: `manual run: ${version} not on npm yet: publish with --tag ${distTag}` };
+  }
   if (previousVersion === version) {
     return { ...base, release: false, reason: `version ${version} unchanged since the previous commit` };
   }
@@ -130,14 +144,19 @@ function sh(cmd, args, opts = {}) {
   }
 }
 
-function parseArgs(argv) {
-  const args = { package: ".", notesOut: null };
+/** Events the release check understands; anything else fails closed. */
+export const EVENTS = ["push", "pull_request", "workflow_dispatch"];
+
+export function parseArgs(argv) {
+  const args = { package: ".", notesOut: null, event: "push" };
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === "--package") args.package = argv[++i];
     else if (argv[i] === "--notes-out") args.notesOut = argv[++i];
+    else if (argv[i] === "--event") args.event = argv[++i];
     else throw new Error(`unknown argument: ${argv[i]}`);
   }
   if (!args.package) throw new Error("--package needs a directory");
+  if (!EVENTS.includes(args.event)) throw new Error(`--event must be one of ${EVENTS.join(", ")}; got ${JSON.stringify(args.event)}`);
   return args;
 }
 
@@ -167,12 +186,13 @@ function main() {
     previousVersion,
     publishedVersion,
     isPrivate: pkg.private === true,
+    manual: args.event === "workflow_dispatch",
   });
 
   console.log(`npm ${npmVersion}; ${pkg.name}: HEAD ${pkg.version}, HEAD~1 ${previousVersion ?? "(none)"}, npm ${publishedVersion ?? "(not published)"}`);
   console.log(`${result.release ? "release" : "no release"}: ${result.reason}`);
 
-  if (result.versionChanged && args.notesOut) {
+  if (result.tag && args.notesOut) {
     const changelog = join(args.package, "CHANGELOG.md");
     const section = existsSync(changelog)
       ? changelogSection(readFileSync(changelog, "utf8"), pkg.version)
@@ -192,6 +212,7 @@ function main() {
         `prerelease=${result.prerelease}`,
         `published=${result.published}`,
         `version-changed=${result.versionChanged}`,
+        `tag=${result.tag}`,
         "",
       ].join("\n"),
     );
