@@ -91,6 +91,32 @@ jobs:
         if: matrix.react == 19 && matrix.node == 24
         run: npm pack --dry-run -w react-data-export
 
+  # RDE-1.10: javascript-excel's conformance corpus through the public API
+  # (packages/react-data-export/test/conformance, docs/conformance.md), with
+  # openpyxl. The test matrix above runs the same tests without openpyxl.
+  conformance:
+    name: Conformance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26
+          cache: npm
+      - run: npm ci
+      - name: The corpus copy matches the installed javascript-excel's tag
+        run: node scripts/sync-jse-corpus.mjs --check
+      # Same openpyxl as javascript-excel's CI; installed in a virtualenv, not a project dependency.
+      - name: Python tools (openpyxl)
+        run: |
+          python3 -m venv "$RUNNER_TEMP/py"
+          "$RUNNER_TEMP/py/bin/pip" install --quiet openpyxl==3.1.5
+          echo "RDE_PYTHON=$RUNNER_TEMP/py/bin/python" >> "$GITHUB_ENV"
+      - name: Conformance tests (openpyxl required)
+        env:
+          RDE_REQUIRE_OPENPYXL: '1'
+        run: npm test -w react-data-export -- test/conformance
+
   # Consumer TypeScript matrix: one tarball, type-checked by a consumer project
   # on several TypeScript versions, @types/react majors and moduleResolution modes.
   pack:

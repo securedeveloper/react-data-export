@@ -20,7 +20,8 @@
     "consumer-ts": "node scripts/consumer-ts.mjs",
     "version-packages": "changeset version && node scripts/sync-version.mjs --package packages/react-data-export --file packages/react-data-export/src/index.ts && npm install --package-lock-only --no-audit --no-fund",
     "test:release": "node --test \"scripts/*.test.mjs\"",
-    "bundlers": "node scripts/bundlers.mjs"
+    "bundlers": "node scripts/bundlers.mjs",
+    "conformance:sync": "node scripts/sync-jse-corpus.mjs"
   },
   "devDependencies": {
     "@changesets/cli": "3.0.3",

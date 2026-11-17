@@ -63,6 +63,7 @@
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest",
+    "conformance:doc": "UPDATE_CONFORMANCE_DOC=1 vitest run test/conformance/conformance.test.ts -t \"docs/conformance.md\"",
     "lint:pkg": "publint --strict && attw --pack . --profile node16"
   },
   "devDependencies": {
