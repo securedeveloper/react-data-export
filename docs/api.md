@@ -1,6 +1,6 @@
 # react-data-export 1.0: API design (dataset module)
 
-Status: **design decided (2026-11-16); the dataset module is implemented** (RDE-1.9) on **javascript-excel ≥ 2.0.0-alpha.2** (see [§9](#9-dependencies-and-order)). It is not published yet. Table export (module B, [§13](#13-table-export)) is designed and implemented in RDE-1.17.
+Status: **design decided (2026-11-16); the dataset module is implemented** (RDE-1.9) on **javascript-excel ≥ 2.0.0-beta.0** (see [§9](#9-dependencies-and-order)), and ships in the 1.0 prereleases on npm's `next` tag. The 1.0 feature set is complete: until 1.0.0, changes are limited to fixes found in testing. Table export (module B, [§13](#13-table-export)) is designed and implemented in RDE-1.17.
 
 This document covers module A, **dataset export** (`exportDataset`, `exportWorkbook`, `useExcelExport`, `<ExcelExport>`), and module B, **table export** (`exportTable`, `useTableExport`, `<ExportTableButton>`, [§13](#13-table-export)).
 
@@ -263,10 +263,11 @@ export function ExcelExport(props: ExcelExportProps): ReactElement;
   - react-data-export's own misuse errors (CSV with several sheets, `dataset` and `workbook` both or neither, an unknown `format`) are `TypeError`s. That's how javascript-excel treats invalid options too.
 - **Abort.** `signal` reaches `toBlob`, which checks it between sheet chunks. It is also checked before building and before the download starts. Every export starts by yielding once (one microtask) and re-checking the signal before it builds anything. `toCsvBlob` is synchronous, so without that yield a CSV export started in an effect would finish, download included, before React 18/19 StrictMode's simulated unmount could abort it, and the documented auto-export recipe would save the file twice in development. An abort rejects with `signal.reason` (a `DOMException` `AbortError` by default). `toCsvBlob` is synchronous, so a CSV export can only be aborted before it starts.
 - **Progress.** `onProgress` receives javascript-excel's `Progress` (`phase`, `sheet`, `ratio` from 0 to 1, non-decreasing) from `toBlob`. The building phase (`fromDataset`) is synchronous and reports nothing, so the first progress event comes from the writer. CSV reports no progress.
-- **Big data.** Large exports run on the main thread in 1.0. Off-main-thread writing comes with javascript-excel's worker entry (its JSE-8):
-  - `fromDataset` has to run on the main thread, because accessors are functions and can't be sent to a worker.
+- **Big data: the main thread stays responsive.** In 1.0, exports run on the main thread. From javascript-excel 2.0.0-alpha.7 (react-data-export depends on 2.0.0-beta.0 or later, §9), `toBlob` returns to the event loop about every 16 ms while it writes. So a large `.xlsx` export doesn't freeze the page: frames render, input is handled, and `abort()` or an aborted `signal` takes effect while the file is being written. The output bytes are the same as without the pauses. Building the sheet (`fromDataset`, `fromTable`) and writing CSV (`toCsvBlob`) are still synchronous.
+- **Worker: 1.x, not 1.0** (decided 2026-11-17). javascript-excel's worker entry, `javascript-excel/worker` (its §5.5), has existed since 2.0.0-alpha.1. react-data-export adds it after 1.0.0, in a 1.x minor release:
+  - `fromDataset` and `fromTable` have to run on the main thread: accessors are functions and can't be sent to a worker, and the table is in the page.
   - The resulting sheet is plain data, and can be written in a worker.
-  - When JSE-8 ships, `ExportOptions` gains `worker?: WorkerClient`. That is additive, not a breaking change. Until then this is listed under 1.x, not 1.0.
+  - `ExportOptions` gains `worker?: WorkerClient`. That's additive, not a breaking change, so it doesn't have to wait for 2.0.
 
 ## 8. SSR and `"use client"`
 
@@ -287,9 +288,10 @@ export function ExcelExport(props: ExcelExportProps): ReactElement;
 | `toCsvBlob`, `CsvWriteOptions` | `javascript-excel/csv`, §5.3 | 2.0.0-alpha.1 |
 | `download` | `javascript-excel/dom`, §5.4 | 2.0.0-alpha.1 (JSE-7) |
 | `fromTable`, `FromTableOptions`, `TableElement` (§13) | `javascript-excel/dom`, §5.4 | 2.0.0-alpha.1 (JSE-7) |
-| `WorkerClient` (1.x only) | `javascript-excel/worker`, §5.5 | planned (JSE-8) |
+| `toBlob` returning to the event loop while it writes (§7) | core entry, §5.1 | 2.0.0-alpha.7 |
+| `WorkerClient` (1.x only, §7) | `javascript-excel/worker`, §5.5 | 2.0.0-alpha.1 (JSE-8) |
 
-So react-data-export depends on `"javascript-excel": "^2.0.0-alpha.2"` ([Q6](#12-design-decisions)), the first prerelease with `fromDataset`/`fromDatasets`. Nothing in react-data-export reimplements them.
+So react-data-export depends on `"javascript-excel": "^2.0.0-beta.0"` ([Q6](#12-design-decisions)), the first 2.0.0 beta. 2.0.0-alpha.2 was the first prerelease with `fromDataset`/`fromDatasets`, and 2.0.0-alpha.7 the first whose writer yields to the browser. Nothing in react-data-export reimplements them.
 
 ## 10. Feature coverage
 
@@ -306,7 +308,7 @@ The 1.0 feature list, and where each one comes from:
 | Totals row / formulas, hyperlinks (#103 #99 #175) | `total` on columns; cells with `formula` / `hyperlink` |
 | RTL sheets (#109 #162 #157) | `rightToLeft` (`DatasetOptions`) |
 | CSV options: delimiter, BOM, injection guard (#138) | `format: 'csv'` + `csv` (`CsvWriteOptions`); the injection guard is on by default |
-| Big data: progress, `AbortSignal` (#154 #170 #153) | `onProgress`, `signal`, hook `abort()`; worker in 1.x (§7) |
+| Big data: progress, `AbortSignal` (#154 #170 #153) | `onProgress`, `signal`, hook `abort()`; the writer yields to the browser on the main thread; worker in 1.x (§7) |
 | SSR-safe, no `window` at import (#168 family) | §8 |
 | Export an HTML table (#172) | `exportTable`, `useTableExport`, `<ExportTableButton>` over `fromTable` (§13) |
 
@@ -339,7 +341,7 @@ These were the open questions of the review. Each one is decided, and the sectio
 
 **Q5. `<ExcelExport>` triggers.** Decided (2026-11-16): a default button or a render prop, with no `cloneElement` (§6). The 0.x-style `element` with an injected `onClick` is not carried over, because it breaks with components that don't forward `onClick` and with fragments.
 
-**Q6. javascript-excel range during the 2.0 prereleases.** Decided (2026-11-16): `"javascript-excel": "^2.0.0-alpha.2"` (§9). A caret on a prerelease matches only later 2.0.0 prereleases and 2.0.0 itself. An exact pin bumped with each alpha was not taken.
+**Q6. javascript-excel range during the 2.0 prereleases.** Decided (2026-11-16): a caret range on a prerelease, `"javascript-excel": "^2.0.0-alpha.2"` at the time and `^2.0.0-beta.0` now (§9). A caret on a prerelease matches only later 2.0.0 prereleases and 2.0.0 itself. An exact pin bumped with each alpha was not taken.
 
 **Q7. Accessor fields.** Decided (2026-11-16): javascript-excel's `key` / `path` / `value` / `index` pass through unchanged (§3). That gives one documented shape for every framework and no ambiguity about `'a.b'`. A combined react-data-export field mapped to `key` or `path`, which javascript-excel's Q18 would allow, was not taken.
 

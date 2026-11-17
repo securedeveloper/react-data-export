@@ -25,7 +25,7 @@ function Orders() {
 }
 ```
 
-There are also plain async functions (`exportDataset`, `exportWorkbook`, `exportTable`) and hooks (`useExcelExport`, `useTableExport`). Every export resolves with `{ blob, filename, format, warnings }`. The full API is in [docs/api.md](https://github.com/securedeveloper/react-data-export/blob/main/docs/api.md).
+There are also plain async functions (`exportDataset`, `exportWorkbook`, `exportTable`) and hooks (`useExcelExport`, `useTableExport`). Every export resolves with `{ blob, filename, format, warnings }`. A large `.xlsx` export doesn't freeze the page: the writer returns to the event loop about every 16 ms. A Web Worker option is planned for a 1.x release. The full API is in [docs/api.md](https://github.com/securedeveloper/react-data-export/blob/main/docs/api.md).
 
 Moving from 0.x in steps? `react-data-export/legacy` keeps `<ExcelFile>`, `<ExcelSheet>` and `<ExcelColumn>` working on 1.0 (deprecated, removed in 2.0); see the [quick path](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md#11-quick-path-react-data-exportlegacy).
 

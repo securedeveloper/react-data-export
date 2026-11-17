@@ -11,6 +11,7 @@ import { execFileSync } from 'node:child_process';
 import { appendFileSync, cpSync, existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
+import { brotliCompressSync, constants, gzipSync } from 'node:zlib';
 
 const root = resolve(import.meta.dirname, '..');
 const pkgDir = join(root, 'packages/react-data-export');
@@ -55,7 +56,55 @@ function scanClientBundle(dir) {
   return `${js.length} JS files, ${(bytes / 1024).toFixed(0)} KiB`;
 }
 
+const kib = (n) => `${(n / 1024).toFixed(1)} KiB`;
+
+/** Size of the JavaScript an app ships: minified, gzip -9 and brotli -11, summed over its files. */
+function jsSize(dir) {
+  const size = { min: 0, gzip: 0, brotli: 0 };
+  for (const file of filesIn(dir, /\.js$/)) {
+    const buf = readFileSync(file);
+    size.min += buf.length;
+    size.gzip += gzipSync(buf, { level: 9 }).length;
+    size.brotli += brotliCompressSync(buf, { params: { [constants.BROTLI_PARAM_QUALITY]: 11 } }).length;
+  }
+  return size;
+}
+
+// fixtures/bundle-size: what react-data-export adds to a Vite + React 19
+// production build, per usage, against the same app without it (#110).
+const SIZE_ENTRIES = [
+  ['dataset', '1.0: `exportDataset` behind a button'],
+  ['table', '1.0: `<ExportTableButton>` on a table'],
+  ['all', '1.0: every export of the main entry'],
+  ['v0.6', '0.6.0: `<ExcelFile>` + `<ExcelSheet>` + `<ExcelColumn>`'],
+];
+const sizeTables = [];
+
 const CHECKS = {
+  'bundle-size': (app) => {
+    const build = (entry) => {
+      run('npm', ['run', 'build'], app, { ENTRY: entry });
+      return jsSize(join(app, 'dist', entry));
+    };
+    const version = (name) => JSON.parse(readFileSync(join(app, 'node_modules', name, 'package.json'), 'utf8')).version;
+    const base = build('baseline');
+    const rows = SIZE_ENTRIES.map(([entry, what]) => {
+      const s = build(entry);
+      // 1.0 builds get the same no-fs/tempa-xlsx/jszip scan as the other fixtures; 0.6.0 has them all.
+      if (entry !== 'v0.6') scanClientBundle(join(app, 'dist', entry));
+      return `| ${what} | +${kib(s.min - base.min)} | +${kib(s.gzip - base.gzip)} | +${kib(s.brotli - base.brotli)} |`;
+    });
+    sizeTables.push(
+      [
+        `Added to a Vite ${version('vite')} + React ${version('react')} production build by react-data-export ${version('react-data-export')} on javascript-excel ${version('javascript-excel')} (baseline, React alone: ${kib(base.min)} minified, ${kib(base.gzip)} gzip):`,
+        '',
+        '| app | minified | gzip -9 | brotli -11 |',
+        '|---|---|---|---|',
+        ...rows,
+      ].join('\n'),
+    );
+    return `baseline ${kib(base.gzip)} gzip; see the size table`;
+  },
   'vite-react19': (app) => {
     run('npm', ['run', 'build'], app);
     return scanClientBundle(join(app, 'dist'));
@@ -124,5 +173,9 @@ try {
 
 const table = ['| fixture | result | notes |', '|---|---|---|', ...results.map((r) => `| ${r.name} | ${r.ok ? 'pass' : '**fail**'} | ${r.note} |`)].join('\n');
 console.log(`\n${table}`);
-if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, `### Bundlers\n\n${table}\n`);
+for (const t of sizeTables) console.log(`\n${t}`);
+if (process.env.GITHUB_STEP_SUMMARY) {
+  appendFileSync(process.env.GITHUB_STEP_SUMMARY, `### Bundlers\n\n${table}\n`);
+  for (const t of sizeTables) appendFileSync(process.env.GITHUB_STEP_SUMMARY, `\n### Bundle size\n\n${t}\n`);
+}
 if (results.some((r) => !r.ok)) process.exit(1);

@@ -1,0 +1,8 @@
+{
+  "name": "fixture-bundle-size",
+  "private": true,
+  "type": "module",
+  "scripts": { "build": "vite build" },
+  "dependencies": { "react": "19.3.1", "react-dom": "19.3.1", "react-data-export-0.6": "npm:react-data-export@0.6.0", "prop-types": "15.8.1" },
+  "devDependencies": { "vite": "8.3.8" }
+}
