@@ -1,4 +1,3 @@
-import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import react from '@vitejs/plugin-react';
 import { defineConfig, type UserConfig } from 'vite';
@@ -6,13 +5,17 @@ import { defineConfig, type UserConfig } from 'vite';
 // Resolve the library from source so the playground always matches the branch
 // it is built from, without a separate package build step. The packed tarball
 // (what npm users get) is covered by the smoke test and the bundler matrix.
-//
-// `vite preview` serves the same security headers as Vercel (vercel.json), so
-// the Content-Security-Policy is exercised locally before a deploy.
-const vercel = JSON.parse(readFileSync(new URL('./vercel.json', import.meta.url), 'utf8')) as {
-  headers: Array<{ headers: Array<{ key: string; value: string }> }>;
+
+// `vite preview` serves a strict Content-Security-Policy and the other security
+// headers (they used to live in vercel.json), so the sandbox and its tests
+// exercise the CSP. This app is not deployed; the public playground,
+// securedeveloper/react-data-export-playground, sets its own headers.
+const headers: Record<string, string> = {
+  'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+  'Referrer-Policy': 'no-referrer',
+  'X-Content-Type-Options': 'nosniff',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
 };
-const headers = Object.fromEntries(vercel.headers.flatMap((h) => h.headers.map(({ key, value }) => [key, value])));
 
 const config: UserConfig = defineConfig({
   plugins: [react()],
