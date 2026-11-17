@@ -275,7 +275,7 @@ export function App(): ReactElement {
   return (
     <>
       <aside className="banner" aria-label="Prerelease notice">
-        <strong>Prerelease.</strong> react-data-export {version} is an alpha; the API can still change before 1.0.0. Everything runs in your browser: no uploads, no tracking, no cookies.
+        <strong>Prerelease.</strong> react-data-export {version} is a 1.0 prerelease. The feature set is complete; until 1.0.0, changes are limited to fixes found in testing. Everything runs in your browser: no uploads, no tracking, no cookies.
       </aside>
       <main>
         <header>
