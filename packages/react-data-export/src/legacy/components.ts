@@ -83,11 +83,37 @@ function propsOf<P>(node: ReactNode): P[] {
     .map((child) => child.props);
 }
 
+/** Excel's limit on sheet name length. */
+const MAX_SHEET_NAME = 31;
+
+/**
+ * `name`, or `name (2)`, `name (3)`... when it is already taken (Excel compares
+ * sheet names case-insensitively). The base is shortened to keep the result
+ * within 31 characters, without splitting a surrogate pair.
+ */
+function uniqueSheetName(name: string, taken: Set<string>): string {
+  let candidate = name;
+  for (let n = 2; taken.has(candidate.toLowerCase()); n++) {
+    const suffix = ` (${n})`;
+    const chars = Array.from(name);
+    while (chars.join('').length + suffix.length > MAX_SHEET_NAME) chars.pop();
+    candidate = chars.join('') + suffix;
+  }
+  taken.add(candidate.toLowerCase());
+  return candidate;
+}
+
 function buildSheets(children: ReactNode, onWarning: (w: ExcelWarning) => void): Sheet[] {
+  const taken = new Set<string>();
   return propsOf<ExcelSheetProps>(children).map((sheet) => {
-    const name = sanitizeSheetName(String(sheet.name ?? ''));
-    if (name !== sheet.name) {
-      warnOnce(`name:${String(sheet.name)}`, `sheet name ${JSON.stringify(sheet.name)} is not valid in Excel; written as ${JSON.stringify(name)}.`);
+    const valid = sanitizeSheetName(String(sheet.name ?? ''));
+    if (valid !== sheet.name) {
+      warnOnce(`name:${String(sheet.name)}`, `sheet name ${JSON.stringify(sheet.name)} is not valid in Excel; written as ${JSON.stringify(valid)}.`);
+    }
+    // 0.x wrote duplicate names as given, a file Excel offered to repair; 1.0 would reject them.
+    const name = uniqueSheetName(valid, taken);
+    if (name !== valid) {
+      warnOnce(`dup:${name}`, `sheet name ${JSON.stringify(valid)} is used by more than one <ExcelSheet>; written as ${JSON.stringify(name)}.`);
     }
     if (sheet.dataSet && sheet.dataSet.length > 0) return sheetFromDataSet(name, sheet.dataSet, onWarning);
     const rows = typeof sheet.data === 'function' ? sheet.data() : (sheet.data ?? []);

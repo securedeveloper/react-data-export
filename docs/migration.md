@@ -84,7 +84,7 @@ What it does **not** reproduce, on purpose:
 - **`fileExtension: 'csv'`** writes real CSV (UTF-8 BOM, CRLF, formula-injection guard). With several sheets, it writes the first one and warns.
 - **`'xls'`, `'txt'` and `'html'`** write an xlsx file with an `.xlsx` name and a development warning. 0.x wrote xlsx bytes under the other extension.
 - **String `dataSet` columns** (`columns: ['Name', 'Dept']`) keep their header text. 0.6.0 left those headers empty, a regression in its last release.
-- **Conditional children:** falsy `<ExcelSheet>` and `<ExcelColumn>` children are skipped, and an invalid sheet name is sanitized with a warning instead of producing a broken file.
+- **Conditional children:** falsy `<ExcelSheet>` and `<ExcelColumn>` children are skipped, an invalid sheet name is sanitized with a warning, and a duplicate sheet name (compared case-insensitively) is written as `name (2)`, `name (3)`... with a warning, instead of producing a broken file.
 
 `convertLegacyStyle` ([3.7](#37-cell-styles)) is exported from the same entry. The legacy code is a separate entry, so it isn't in your bundle unless you import it.
 
