@@ -96,7 +96,7 @@ Thanks to the community pull requests whose ideas shaped 1.0:
 | #85 | Error by importing the project | Fixed in 1.0.0-alpha.1 | No `tempa-xlsx`, `xlsx`, `file-saver` or `prop-types` any more; the only dependency is javascript-excel (no runtime deps). Import errors from the old dependency chain can't happen. |
 | #90 | issue in react js dependence added time Module not found: Can't resolve 'react-data-export'  using | Fixed in 1.0.0-alpha.1 | Same: the 0.x dependency chain is gone; `exports` map with ESM + CJS + types, smoke-tested from the packed tarball in CI. |
 | #100 | Module not found: Can't resolve 'prop-types' in \node_modules\react-data-export\dist\ExcelPlugin\components | Fixed in 1.0.0-alpha.1 | `prop-types` is not used in 1.0. |
-| #110 | xlsx dependency blows up webpack bundle size | Fixed in 1.0.0-alpha.1 | `xlsx`/`tempa-xlsx` are no longer dependencies; javascript-excel has zero runtime dependencies and per-entry tree-shaking (writer, CSV, DOM are separate entries). Bundle size: [placeholder, measure in the bundler matrix]. |
+| #110 | xlsx dependency blows up webpack bundle size | Fixed in 1.0.0-alpha.1 | `xlsx`/`tempa-xlsx` are no longer dependencies; javascript-excel has zero runtime dependencies and per-entry tree-shaking (writer, CSV, DOM are separate entries). Bundle size, measured with the bundler matrix's `bundle-size` fixture (`npm run bundlers -- bundle-size`: Vite 8.3.8 + React 19.3.1 production builds, react-data-export 1.0.0-alpha.3 on javascript-excel 2.0.0-alpha.7, minus the same app with React alone). `exportDataset` adds 72.8 KiB minified (24.7 KiB gzip), `<ExportTableButton>` 78.4 KiB (27.7 KiB gzip), every export of the main entry 90.0 KiB (31.5 KiB gzip). 0.6.0's `<ExcelFile>` adds 741.1 KiB (266.3 KiB gzip). |
 | #168 | Module not found can't resolve 'fs' in node_modules\tempa-xlsx | Fixed in 1.0.0-alpha.1 | No `tempa-xlsx`, so no `fs` import; covered by the CRA/webpack 5 fixture in the bundler matrix (RDE-1.11). |
 | #169 | Why does xlsx get installed into my package.json when installing this package | Fixed in 1.0.0-alpha.1 | `xlsx` is not a dependency or a required peer in 1.0. |
 | #173 | Application crash when using vitejs | Fixed in 1.0.0-alpha.1 | No `cptable`/`xlsx` code; Vite fixture in the bundler matrix. |
@@ -218,7 +218,7 @@ Thanks to the community pull requests whose ideas shaped 1.0:
 | # | title | disposition | how / reason |
 |---|---|---|---|
 | #154 | The maximum you can export to excel is 1299 rows, how to increase the number of exported rows? | Fixed in 1.0.0-alpha.1 | Measured on alpha.1 (Node 24): 1,300 / 10,000 / 100,000 rows × 3 columns export and read back complete (100k rows: 318 ms, 2.1 MB). |
-| #170 | Browser window stops responding | Still open, tracked | The javascript-excel writer works in chunks and yields; a worker option (`javascript-excel/worker`) is planned for react-data-export 1.x. Keep open until the worker option ships. |
+| #170 | Browser window stops responding | Still open, tracked | From javascript-excel 2.0.0-alpha.7, which react-data-export requires, the writer returns to the event loop about every 16 ms, so a large export on the main thread no longer freezes the page. The `worker` option (`javascript-excel/worker`) lands in react-data-export 1.x, not 1.0 (decided 2026-11-17). Keep open until the worker option ships. |
 
 ### Out of scope for 1.0
 
@@ -653,6 +653,6 @@ Each comment is followed by the footer above. "Close" means close after posting;
 
 - **Side-by-side blocks (#134):** `fromDatasets` places a block next to the previous one only with a negative `offset.rows`. A clearer option (for example `offset: { beside: true }`) is a javascript-excel ticket.
 - **Excel checks (#76, #94):** open a 1.0.0-alpha.1 single-sheet and multi-sheet file in Excel for Mac and Windows; close both issues with the result.
-- **Bundle size (#110):** the bundler matrix (RDE-1.11) can record the size of a minimal app with and without react-data-export, so the comment can quote a measured number instead of `[placeholder]`.
-- **Worker option (#170):** `ExportOptions.worker` on javascript-excel's `WorkerClient` (docs/api.md §7), for react-data-export 1.x.
+- **Bundle size (#110):** measured (2026-11-17) with the bundler matrix's `bundle-size` fixture; the numbers are in the #110 row in §2. The `Bundlers` CI job prints the same table in its summary on every run.
+- **Worker option (#170):** `ExportOptions.worker` on javascript-excel's `WorkerClient` (docs/api.md §7), in react-data-export 1.x, not 1.0 (decided 2026-11-17). Until then, the main-thread writer yields to the browser (javascript-excel 2.0.0-alpha.7).
 
