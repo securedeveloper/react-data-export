@@ -1,6 +1,6 @@
 {
   "name": "react-data-export",
-  "version": "1.0.0-alpha.3",
+  "version": "1.0.0-beta.0",
   "description": "Export data from React to .xlsx and .csv. 1.0 is a from-scratch rewrite in progress.",
   "license": "MIT",
   "author": "Afzal Ahmad",

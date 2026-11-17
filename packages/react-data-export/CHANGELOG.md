@@ -1,5 +1,14 @@
 # react-data-export
 
+## 1.0.0-beta.0
+
+First beta of 1.0.0, on the `next` dist-tag. The 1.0 feature set is complete: everything in the 1.0.0-alpha releases below. Until 1.0.0, changes are limited to fixes found in testing. The Web Worker option (`worker`, on `javascript-excel/worker`) comes in a 1.x release, not in 1.0. Until then the main-thread writer yields to the browser, so large exports keep the page responsive. The 0.x API (`<ExcelFile>`, `<ExcelSheet>`, `<ExcelColumn>`) runs on 1.0 through the deprecated `react-data-export/legacy` entry (removed in 2.0); see the migration guide. 0.6.0 stays on `latest` until 1.0.0. Bundle size: in a Vite + React 19 production build, 1.0 adds 24.7 KiB gzip for `exportDataset` and 31.5 KiB with every export, against 266.3 KiB for 0.6.0's `<ExcelFile>` (measured with the bundler matrix's `bundle-size` fixture).
+
+### Patch Changes
+
+- f48b7b6: README: the 1.0 feature set is complete; until 1.0.0, changes are limited to fixes found in testing. A Web Worker option comes in a 1.x release.
+- f48b7b6: Depend on javascript-excel `^2.0.0-beta.0`, its first 2.0.0 beta. Since 2.0.0-alpha.7 its writer returns to the event loop about every 16 ms, so a large `.xlsx` export on the main thread no longer freezes the page, and `signal`/`abort()` take effect while it runs.
+
 ## 1.0.0-alpha.3
 
 ### Patch Changes
