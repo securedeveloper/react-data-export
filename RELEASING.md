@@ -65,7 +65,7 @@ For a release, the job then:
 2. runs `npm publish ./packages/react-data-export --tag next|latest`,
 3. runs `gh release create v<version>`, which creates the tag on the merge commit. The notes are that version's section of `CHANGELOG.md`.
 
-The job also checks that npm is at least 11.5.1, which trusted publishing requires. Node 24 ships a newer npm.
+The job also checks that npm is at least 11.5.1, which trusted publishing requires. Node 26 ships a newer npm (11.x).
 
 Re-running the job is safe:
 - After a failed publish, the version is still unpublished, so the re-run publishes.
