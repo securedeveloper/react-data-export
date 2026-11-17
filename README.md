@@ -4,7 +4,7 @@ Export data from React to `.xlsx` and `.csv`.
 
 ## Status: 1.0 is a from-scratch rewrite, in progress
 
-- **1.0 is a clean break.** It is being rebuilt on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0 and will not ship the 0.x `<ExcelFile>` / `<ExcelSheet>` / `<ExcelColumn>` API. See [Migrating from 0.x](#migrating-from-0x).
+- **1.0 has a new API.** It is rebuilt on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0, and its main entry has no `<ExcelFile>` / `<ExcelSheet>` / `<ExcelColumn>`. The 0.6 API ships only as the deprecated `react-data-export/legacy` entry: supported for all of 1.x, removed in 2.0. See [Migrating from 0.x](#migrating-from-0x).
 - **1.0 prereleases are on npm's `next` tag:** `npm install react-data-export@next`. They have dataset export (`exportDataset`, `exportWorkbook`, `useExcelExport`, `<ExcelExport>`) and table export for an HTML `<table>` (`exportTable`, `useTableExport`, `<ExportTableButton>`), as specified in [docs/api.md](docs/api.md), built on javascript-excel 2.0's `fromDataset`, `fromTable`, writer and download. As an alpha, the API may still change before 1.0.0. Coming from 0.x: the [migration guide](docs/migration.md).
 
   ```tsx
@@ -19,6 +19,7 @@ Export data from React to `.xlsx` and `.csv`.
     Download people.xlsx
   </ExcelExport>
   ```
+- **Try it in the browser:** the [playground](https://react-data-export-playground.vercel.app/) runs the published 1.0 prerelease.
 - **0.6.x stays on npm unchanged, and `latest` is still 0.6.0:** a plain `npm install react-data-export` keeps installing 0.6.0 until 1.0.0 is final, and `npm install react-data-export@0.6` keeps working. Nothing is unpublished or deprecated.
 - **Legacy code and docs** (0.x README, examples, Babel/Jest setup) live at the [`v0.6.0` tag](https://github.com/securedeveloper/react-data-export/tree/v0.6.0).
 
@@ -80,7 +81,8 @@ Types ship with the package (`.d.ts` for `import`, `.d.cts` for `require`). CI t
 
 ```
 packages/react-data-export/   the published library (TypeScript, ESM + CJS + .d.ts)
-apps/playground/              Vite + React 19 demo app (will be deployed to Vercel)
+apps/playground/              Vite + React 19 dev sandbox, tested in CI (the public playground is
+                              securedeveloper/react-data-export-playground)
 scripts/                      tarball smoke test and CI helpers
 ```
 
