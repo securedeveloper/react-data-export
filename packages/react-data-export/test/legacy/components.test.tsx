@@ -184,6 +184,54 @@ describe('<ExcelFile>', () => {
     expect(warn.mock.calls.some((c: unknown[]) => String(c[0]).includes('"Q1/Q2"'))).toBe(true);
   });
 
+  it('writes duplicate sheet names made unique, with a dev warning', async () => {
+    const long = 'Faturas Aprovadas em 19_09_2018'; // 31 characters
+    render(
+      <ExcelFile hideElement>
+        <ExcelSheet data={rows} name="test">
+          <ExcelColumn label="Name" value="name" />
+        </ExcelSheet>
+        <ExcelSheet data={rows} name="test">
+          <ExcelColumn label="Joined" value="joined" />
+        </ExcelSheet>
+        <ExcelSheet data={rows} name="TEST">
+          <ExcelColumn label="Name" value="name" />
+        </ExcelSheet>
+        <ExcelSheet data={rows} name={long}>
+          <ExcelColumn label="Name" value="name" />
+        </ExcelSheet>
+        <ExcelSheet data={rows} name={long}>
+          <ExcelColumn label="Name" value="name" />
+        </ExcelSheet>
+      </ExcelFile>,
+    );
+    const { workbook } = await read((await downloaded()).blob);
+    expect(workbook.sheets.map((s) => s.name)).toEqual([
+      'test',
+      'test (2)',
+      'TEST (3)',
+      long,
+      'Faturas Aprovadas em 19_09_ (2)',
+    ]);
+    expect(workbook.sheets[1]?.rows[0]?.map((c) => c?.value)).toEqual(['Joined']);
+    expect(warn.mock.calls.some((c: unknown[]) => String(c[0]).includes('written as "test (2)"'))).toBe(true);
+  });
+
+  it('makes names unique after sanitizing them', async () => {
+    render(
+      <ExcelFile hideElement>
+        <ExcelSheet data={rows} name="Q1/Q2">
+          <ExcelColumn label="Name" value="name" />
+        </ExcelSheet>
+        <ExcelSheet data={rows} name="Q1_Q2">
+          <ExcelColumn label="Name" value="name" />
+        </ExcelSheet>
+      </ExcelFile>,
+    );
+    const { workbook } = await read((await downloaded()).blob);
+    expect(workbook.sheets.map((s) => s.name)).toEqual(['Q1_Q2', 'Q1_Q2 (2)']);
+  });
+
   it('a non-string filename is reported, nothing is downloaded', async () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     render(
