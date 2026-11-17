@@ -1,5 +1,12 @@
 # react-data-export
 
+## 1.0.0-alpha.3
+
+### Patch Changes
+
+- 1a36b62: `react-data-export/legacy`: two `<ExcelSheet>` elements with the same name (compared case-insensitively) no longer fail the export; the later ones are written as `name (2)`, `name (3)`... with a development warning. 0.x wrote such files as given, and Excel offered to repair them (#94).
+- 3ce8219: README: the 0.6 API is described as shipping only in the deprecated `react-data-export/legacy` entry (removed in 2.0), and the playground is linked.
+
 ## 1.0.0-alpha.2
 
 ### Minor Changes
