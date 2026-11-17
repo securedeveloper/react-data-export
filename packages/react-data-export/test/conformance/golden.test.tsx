@@ -147,6 +147,10 @@ const INNER = `
 `;
 const TABLE = `<table dir="rtl">${INNER}</table>`;
 const tableOptions: FromTableOptions = { name: 'Sales', styles: 'computed', freezeHeader: true, autoFilter: true, autoWidth: true };
+// Fixed timestamps: without them, docProps/core.xml holds the time of each write,
+// and two files written a second apart differ.
+const FIXED = new Date(Date.UTC(2026, 10, 16, 9, 0, 0));
+const tableProperties = { created: FIXED, modified: FIXED };
 
 beforeEach(() => {
   document.head.innerHTML = `<style>${STYLE}</style>`;
@@ -157,7 +161,7 @@ afterEach(() => {
 });
 
 /** javascript-excel's file for the table currently in the document. */
-const jseTable = async (): Promise<Buffer> => Buffer.from(await toUint8Array({ sheets: [fromTable(document.querySelector('table')!, tableOptions)] }));
+const jseTable = async (): Promise<Buffer> => Buffer.from(await toUint8Array({ properties: tableProperties, sheets: [fromTable(document.querySelector('table')!, tableOptions)] }));
 
 /** The golden table, rendered by React, with an object ref. */
 function GoldenTable({ tableRef }: { tableRef: { current: HTMLTableElement | null } }) {
@@ -166,7 +170,7 @@ function GoldenTable({ tableRef }: { tableRef: { current: HTMLTableElement | nul
 
 function TableHookProbe({ api }: { api: { current: UseTableExport | null } }) {
   const ref = useRef<HTMLTableElement | null>(null);
-  api.current = useTableExport(ref, { ...tableOptions, download: false });
+  api.current = useTableExport(ref, { ...tableOptions, download: false, properties: tableProperties });
   return <GoldenTable tableRef={ref} />;
 }
 
@@ -175,7 +179,7 @@ function TableButton({ onExported }: { onExported: (r: ExportResult) => void }) 
   return (
     <>
       <GoldenTable tableRef={ref} />
-      <ExportTableButton tableRef={ref} {...tableOptions} download={false} onExported={onExported}>
+      <ExportTableButton tableRef={ref} {...tableOptions} download={false} properties={tableProperties} onExported={onExported}>
         Export
       </ExportTableButton>
     </>
@@ -185,7 +189,7 @@ function TableButton({ onExported }: { onExported: (r: ExportResult) => void }) 
 describe('the table golden case through react-data-export', () => {
   it('exportTable is byte-identical to fromTable + toUint8Array', async () => {
     document.body.innerHTML = TABLE;
-    const result = await exportTable(document.querySelector('table')!, { ...tableOptions, download: false });
+    const result = await exportTable(document.querySelector('table')!, { ...tableOptions, download: false, properties: tableProperties });
     expect((await bytesOf(result.blob)).equals(await jseTable())).toBe(true);
     expect(result.warnings).toEqual([]);
   });
