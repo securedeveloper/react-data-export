@@ -2,7 +2,7 @@
 
 Export data from React to `.xlsx` and `.csv`, built on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0.
 
-> **This is a 1.0 prerelease of a from-scratch rewrite** (`npm install react-data-export@next`). The API may still change before 1.0.0. 1.0's main API is new: the main entry has no `<ExcelFile>` / `<ExcelSheet>` / `<ExcelColumn>`, and the 0.6 API ships only as the deprecated `react-data-export/legacy` entry (removed in 2.0). The [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) shows every 0.x pattern next to its 1.0 code. The `latest` tag stays **0.6.0** until 1.0.0 is final; the 0.x docs are at the [`v0.6.0` tag](https://github.com/securedeveloper/react-data-export/tree/v0.6.0).
+> **1.0 is a from-scratch rewrite** (`npm install react-data-export`). Its main API is new: the main entry has no `<ExcelFile>` / `<ExcelSheet>` / `<ExcelColumn>`, and the 0.6 API ships only as the deprecated `react-data-export/legacy` entry (removed in 2.0). The [migration guide](https://github.com/securedeveloper/react-data-export/blob/main/docs/migration.md) shows every 0.x pattern next to its 1.0 code. 0.6.x stays on npm (`npm install react-data-export@0.6`); the 0.x docs are at the [`v0.6.0` tag](https://github.com/securedeveloper/react-data-export/tree/v0.6.0).
 
 ```tsx
 import { useRef } from 'react';
