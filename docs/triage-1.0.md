@@ -218,7 +218,7 @@ Thanks to the community pull requests whose ideas shaped 1.0:
 | # | title | disposition | how / reason |
 |---|---|---|---|
 | #154 | The maximum you can export to excel is 1299 rows, how to increase the number of exported rows? | Fixed in 1.0.0-alpha.1 | Measured on alpha.1 (Node 24): 1,300 / 10,000 / 100,000 rows × 3 columns export and read back complete (100k rows: 318 ms, 2.1 MB). |
-| #170 | Browser window stops responding | Still open, tracked | From javascript-excel 2.0.0-alpha.7 (react-data-export requires 2.0.0-beta.0 or later), the writer returns to the event loop about every 16 ms, so a large export on the main thread no longer freezes the page. The `worker` option (`javascript-excel/worker`) lands in react-data-export 1.x, not 1.0 (decided 2026-11-17). Keep open until the worker option ships. |
+| #170 | Browser window stops responding | Still open, tracked | From javascript-excel 2.0.0-alpha.7 (react-data-export requires 2.0.0 or later), the writer returns to the event loop about every 16 ms, so a large export on the main thread no longer freezes the page. The `worker` option (`javascript-excel/worker`) lands in react-data-export 1.x, not 1.0 (decided 2026-11-17). Keep open until the worker option ships. |
 
 ### Out of scope for 1.0
 
