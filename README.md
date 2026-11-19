@@ -2,10 +2,10 @@
 
 Export data from React to `.xlsx` and `.csv`.
 
-## Status: 1.0 is a from-scratch rewrite, in progress
+## Status: 1.0 is a from-scratch rewrite
 
 - **1.0 has a new API.** It is rebuilt on [javascript-excel](https://github.com/securedeveloper/javascript-excel) 2.0, and its main entry has no `<ExcelFile>` / `<ExcelSheet>` / `<ExcelColumn>`. The 0.6 API ships only as the deprecated `react-data-export/legacy` entry: supported for all of 1.x, removed in 2.0. See [Migrating from 0.x](#migrating-from-0x).
-- **1.0 prereleases are on npm's `next` tag:** `npm install react-data-export@next`. They have dataset export (`exportDataset`, `exportWorkbook`, `useExcelExport`, `<ExcelExport>`) and table export for an HTML `<table>` (`exportTable`, `useTableExport`, `<ExportTableButton>`), as specified in [docs/api.md](docs/api.md), built on javascript-excel 2.0's `fromDataset`, `fromTable`, writer and download. The 1.0 feature set is complete: until 1.0.0, changes are limited to fixes found in testing. Coming from 0.x: the [migration guide](docs/migration.md).
+- **1.0.0 is on npm's `latest` tag:** `npm install react-data-export`. It has dataset export (`exportDataset`, `exportWorkbook`, `useExcelExport`, `<ExcelExport>`) and table export for an HTML `<table>` (`exportTable`, `useTableExport`, `<ExportTableButton>`), as specified in [docs/api.md](docs/api.md), built on javascript-excel 2.0's `fromDataset`, `fromTable`, writer and download. Coming from 0.x: the [migration guide](docs/migration.md).
 - **Big exports stay responsive.** Exports run on the main thread. Since javascript-excel 2.0.0-alpha.7 (react-data-export requires 2.0.0 or later), the `.xlsx` writer returns to the event loop about every 16 ms, so the page keeps rendering and handling input during a large export, and `abort()` works while it runs. A `worker` option, which writes the file in a Web Worker on top of `javascript-excel/worker`, comes in a 1.x release after 1.0.0, not in 1.0 ([docs/api.md §7](docs/api.md#7-errors-abort-and-progress)).
 
   ```tsx
@@ -20,8 +20,8 @@ Export data from React to `.xlsx` and `.csv`.
     Download people.xlsx
   </ExcelExport>
   ```
-- **Try it in the browser:** the [playground](https://react-data-export-playground.vercel.app/) runs the published 1.0 prerelease.
-- **0.6.x stays on npm unchanged, and `latest` is still 0.6.0:** a plain `npm install react-data-export` keeps installing 0.6.0 until 1.0.0 is final, and `npm install react-data-export@0.6` keeps working. Nothing is unpublished or deprecated.
+- **Try it in the browser:** the [playground](https://react-data-export-playground.vercel.app/) runs the published 1.0 release.
+- **0.6.x stays on npm unchanged:** `latest` is now 1.0.0, so a plain `npm install react-data-export` installs 1.0. Existing `^0.6.0` ranges keep resolving to 0.6.0, and `npm install react-data-export@0.6` keeps working. Nothing is unpublished or deprecated.
 - **Legacy code and docs** (0.x README, examples, Babel/Jest setup) live at the [`v0.6.0` tag](https://github.com/securedeveloper/react-data-export/tree/v0.6.0).
 
 ## Migrating from 0.x

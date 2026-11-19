@@ -27,7 +27,7 @@ Every 1.0 snippet below is a file in [`examples/migration/`](../examples/migrati
 
 ```sh
 npm uninstall file-saver tempa-xlsx    # only if you added them for 0.x
-npm install react-data-export@next     # 1.0 prereleases are on the `next` tag
+npm install react-data-export@^1      # 1.0 is on the `latest` tag
 ```
 
 - **No peer libraries, no bundler setup.** 0.x needed `file-saver` and `tempa-xlsx`, and webpack settings for them (`node: { fs: 'empty' }`, `externals` for `./cptable` and `./jszip`). Delete those. 1.0's only dependency is javascript-excel, which has no dependencies of its own.

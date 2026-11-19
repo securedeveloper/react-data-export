@@ -1,6 +1,6 @@
 # react-data-export 1.0: API design (dataset module)
 
-Status: **design decided (2026-11-16); the dataset module is implemented** (RDE-1.9) on **javascript-excel ≥ 2.0.0** (see [§9](#9-dependencies-and-order)), and ships in the 1.0 prereleases on npm's `next` tag. The 1.0 feature set is complete: until 1.0.0, changes are limited to fixes found in testing. Table export (module B, [§13](#13-table-export)) is designed and implemented in RDE-1.17.
+Status: **design decided (2026-11-16); the dataset module is implemented** (RDE-1.9) on **javascript-excel ≥ 2.0.0** (see [§9](#9-dependencies-and-order)), and ships in 1.0.0 on npm's `latest` tag. Table export (module B, [§13](#13-table-export)) is designed and implemented in RDE-1.17.
 
 This document covers module A, **dataset export** (`exportDataset`, `exportWorkbook`, `useExcelExport`, `<ExcelExport>`), and module B, **table export** (`exportTable`, `useTableExport`, `<ExportTableButton>`, [§13](#13-table-export)).
 
